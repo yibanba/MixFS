@@ -9,9 +9,8 @@
  * Author URI: http://www.yibanba.com/
  * Author E-mail: yibanba@hotmail.com
  */
-
-
-if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!defined('ABSPATH'))
+    exit; // Exit if accessed directly
 
 /**
  * Mix_PATH     = X:\xxx/mixfs/
@@ -45,9 +44,26 @@ final class MixFS {
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
 
         $this->includes();
-        
+
+        add_action('init', array($this, 'sessionStart'), 1);
+        add_action('wp_logout', array($this, 'sessionEnd'));
+        add_action('wp_login', array($this, 'sessionEnd'));
+
         add_filter('template_include', array($this, 'template_loader'));
         add_filter('plugin_action_links', array($this, 'plugin_action_links'));
+    }
+
+    /**
+     * SESSION ... Start $ End
+     */
+    public function sessionStart() {
+        if (!session_id()) {
+            session_start();
+        }
+    }
+
+    public function sessionEnd() {
+        session_destroy();
     }
 
     /**
@@ -76,7 +92,7 @@ final class MixFS {
 
         return array_merge($plugin_links, $links);
     }
-    
+
     /**
      * 核心文件 core/
      */
@@ -84,7 +100,7 @@ final class MixFS {
         $this->core_include();
         $this->modules_include();
     }
-    
+
     function core_include() {
         include_once ( MixFS_PATH . 'core/functions.php');
         include_once ( MixFS_PATH . 'core/admin/init.php');
@@ -95,15 +111,15 @@ final class MixFS {
      * modules/mod_name/mod_name.php
      */
     function modules_include() {
-        $mods_path = glob( MixFS_PATH . "modules/*", GLOB_ONLYDIR);
+        $mods_path = glob(MixFS_PATH . "modules/*", GLOB_ONLYDIR);
         foreach ($mods_path as $mp) {
             $fullpath = $mp . '/' . basename($mp) . '.php';
-            if ( file_exists( $fullpath ) && is_readable( $fullpath ) ) {
+            if (file_exists($fullpath) && is_readable($fullpath)) {
                 include_once( $fullpath );
             }
         }
     }
-    
+
     /**
      * 安装核心功能：表、角色
      */
@@ -111,7 +127,7 @@ final class MixFS {
         include_once ( MixFS_PATH . 'core/admin/install.php');
         do_install_core();
     }
-    
+
     /**
      * 安装核心功能：表、角色
      */
@@ -119,7 +135,7 @@ final class MixFS {
         include_once ( MixFS_PATH . 'core/admin/uninstall.php');
         do_uninstall_core();
     }
-    
+
     public function template_loader($template) {
         $find = array('mixfs.php');
         $file = '';

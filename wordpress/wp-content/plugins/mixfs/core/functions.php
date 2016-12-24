@@ -92,12 +92,16 @@ function mixfs_top($title) {
     if( $_GET['page'] == 'mixfs-entrance') {
         $html .= '<a href="' . $url_entrance . '" class="nav-tab nav-tab-active">财务软件入口</a>';
     } else {
+        if( ! isset($_SESSION['acc_name']) ) {
+            echo "<script type='text/javascript'>location.href='$url_entrance'</script>";
+            exit();
+        }
         $html .= '<a href="' . $url_entrance . '" class="nav-tab">财务软件入口</a>';
         $html .= '<a href="" class="nav-tab nav-tab-active">' . $title . '</a>';
     }
 
-    echo $html . '<a href="' . wp_logout_url() . '" class="nav-tab">退出软件</a></h2>' . '<p>';
+    echo $html . '<a href="' . wp_logout_url() . '" class="nav-tab">退出软件</a></h2>';
 }
 function mixfs_bottom() {
-    echo '</p></div>';
+    echo '</div>';
 }
