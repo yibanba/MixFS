@@ -47,7 +47,7 @@ if ($current_week != $old_week) {
         })
     });
 </script>
-<div class="manage-menus"> 请点击下方的账套名称登录 ... </div>
+<div class="manage-menus"> 请选择下方的账套名称后进行操作 ... </div>
 <br class="clear" />
 
 <table class="wp-list-table widefat fixed users" id="entrance" cellspacing="1">
@@ -99,7 +99,7 @@ if (empty($mixfs_acc)) {
             . "<td class='name'>{$acc_name['ma_tbl_detail']}</td>"
             . "</tr>";
 
-            $_SESSION["mas"] = array_merge(array($acc_name['ma_create_md5'] => $acc_name['ma_tbl_prefix']), $_SESSION["mas"]);
+            $_SESSION["mas"][$acc_name['ma_create_md5']] = $acc_name['ma_tbl_prefix'] . '|' . $acc_name['ma_tbl_name'];
         }
     }
     if ($counter == 0) {

@@ -81,8 +81,10 @@ function mixfs_table_install($tbl_name, $tbl_schema) {
 }
 /**
  * 所有页面输出的框架
+ * 顶部：mixfs_top()
+ * 底部：mixfs_bottom()
  */
-function mixfs_top($title) {
+function mixfs_top($title, $acc_name='') {
     $url_entrance = admin_url('admin.php?page=mixfs-entrance'); // 所有页面共用的返回入口链接URL == mixfs-entrance
     
     $html = '<div class="wrap">'
@@ -92,11 +94,11 @@ function mixfs_top($title) {
     if( $_GET['page'] == 'mixfs-entrance') {
         $html .= '<a href="' . $url_entrance . '" class="nav-tab nav-tab-active">财务软件入口</a>';
     } else {
-        if( ! isset($_SESSION['acc_name']) ) {
+        if( ! isset($_SESSION['acc_tbl']) and ! isset($_SESSION['acc_name']) ) {
             echo "<script type='text/javascript'>location.href='$url_entrance'</script>";
             exit();
         }
-        $html .= '<a href="' . $url_entrance . '" class="nav-tab">财务软件入口</a>';
+        $html .= '<a href="' . $url_entrance . '" class="nav-tab">财务软件入口 &#187 ' . $acc_name . '</a>';
         $html .= '<a href="" class="nav-tab nav-tab-active">' . $title . '</a>';
     }
 
