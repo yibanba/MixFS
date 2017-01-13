@@ -33,6 +33,18 @@ function ID2user_login($str_user_ID) {
     }
     return rtrim(trim($str_user_login), " | ");
 }
+
+/**
+ * id转name
+ * 比如 产品ID=>品名，费用ID=>费用名称
+ */
+function id2name($field_name, $table, $source_id, $tbl_id) {
+    global $wpdb;
+    $name = $wpdb->get_var("SELECT {$field_name} FROM {$table} WHERE {$tbl_id}='{$source_id}'");
+
+    return $name;
+ }
+
 /**
  * 
  * 创建前台页面: /?page_id=xxx
@@ -79,6 +91,115 @@ function mixfs_table_install($tbl_name, $tbl_schema) {
     $mixfs_table_schema = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}mixfs_{$tbl_name} {$tbl_schema} {$collate}";
     dbDelta($mixfs_table_schema);
 }
+
+/**
+ * 日期文本框
+ * 2 个参数设置起止时间 2 个文本框
+ * 默认 1 个参数设置
+ * 参数为 <input id="tag_from" name="tag_from">
+ */
+function date_from_to($tag_from, $tag_to='') {
+    
+    if( '' == $tag_to ) {
+        
+        echo <<<DateJS
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $( "#{$tag_from}" ).datepicker({
+        defaultDate: "-1M",
+        numberOfMonths: 2,
+        minDate: new Date(2015, 1 - 1, 1),
+        maxDate: "+1d",
+        monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
+        dayNamesMin: [ "日","一","二","三","四","五","六" ],
+        onClose: function( selectedDate ) {
+            $( "#{$tag_from}" ).datepicker( "option", "dateFormat", "yy-mm-dd" );
+        }
+    });
+});
+</script>
+DateJS;
+                
+    } else {
+        
+        echo <<<DateJS
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $( "#{$tag_from}" ).datepicker({
+      defaultDate: "-1M",
+      numberOfMonths: 2,
+        monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
+        dayNamesMin: [ "日","一","二","三","四","五","六" ],
+      onClose: function( selectedDate ) {
+        $( "#{$tag_to}" ).datepicker( "option", "minDate", selectedDate );
+        $( "#{$tag_from}" ).datepicker( "option", "dateFormat", "yy-mm-dd" );
+      }
+    });
+    $( "#{$tag_to}" ).datepicker({
+        defaultDate: "-1M",
+        numberOfMonths: 2,
+        monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
+        dayNamesMin: [ "日","一","二","三","四","五","六" ],
+        onClose: function( selectedDate ) {
+            $( "#{$tag_from}" ).datepicker( "option", "maxDate", selectedDate );
+            $( "#{$tag_to}" ).datepicker( "option", "dateFormat", "yy-mm-dd" );
+        }
+    });
+});
+</script>
+DateJS;
+        }
+        
+} // date_from_to
+
+/**
+ * 自动提示补全文本框
+ * 双击显示全部
+ * 用来提示 产品名称或费用项目 ...
+ */
+function autocompletejs($cols_format, $tag) {
+    echo <<<autoJS
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+
+    $.widget( "custom.catcomplete", $.ui.autocomplete, {
+        _create: function() {
+            this._super();
+            this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
+        },
+        _renderMenu: function( ul, items ) {
+            var that = this,
+            currentCategory = "";
+            $.each( items, function( index, item ) {
+                var li;
+                if ( item.category != currentCategory ) {
+                    ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+                    currentCategory = item.category;
+                }
+                li = that._renderItemData( ul, item );
+                if ( item.category ) {
+                li.attr( "aria-label", item.category + " : " + item.label );
+                }
+            });
+        }
+    });
+
+    $( "#{$tag}" ).catcomplete({
+      delay: 0,
+      source: [$cols_format]
+    });
+    $( "#{$tag}" ).catcomplete({
+        minLength: 0
+    }).dblclick(function () {
+        $(this).catcomplete('search', '');
+    });
+});
+</script>
+autoJS;
+    
+} // autocompletejs
+
+
 /**
  * 所有页面输出的框架
  * 顶部：mixfs_top()
@@ -102,7 +223,8 @@ function mixfs_top($title, $acc_name='') {
         $html .= '<a href="" class="nav-tab nav-tab-active">' . $title . '</a>';
     }
 
-    echo $html . '<a href="' . wp_logout_url() . '" class="nav-tab">退出软件</a></h2>';
+    echo $html . '<a href="' . wp_logout_url() . '" class="nav-tab">退出软件</a></h2>'
+            . '<br />';
 }
 function mixfs_bottom() {
     echo '</div>';

@@ -72,7 +72,7 @@ function form_add_stuff($acc_prefix, $series_id = '') { // 添加产品系列
         <div class="manage-menus">
             <div class="alignleft actions">
                 <input type="text" id="stuff_name" name="stuff_name" value="输入【{$series_name}】系列的原材料名称..." maxlength="30" size="30" style="color: #ccc;" 
-                       onblur="if (this.value == "') {
+                       onblur="if (this.value == '') {
                                    this.value = '输入【{$series_name}】系列的原材料名称...';
                                    this.style.color = '#ccc';
                                }" 

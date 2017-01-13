@@ -79,7 +79,7 @@ function form_add_item($acc_prefix, $series_id = '') { // 添加产品系列
                 </select>
                 <label for="item_in_out">账面现金 </label>
                 <input type="text" id="item_name" name="item_name" value="输入【{$series_name}】费用分类名称..." maxlength="30" size="30" style="color: #ccc;" 
-                       onblur="if (this.value == "') {
+                       onblur="if (this.value == '') {
                                    this.value = '输入【{$series_name}】费用分类名称...';
                                    this.style.color = '#ccc';
                                }" 

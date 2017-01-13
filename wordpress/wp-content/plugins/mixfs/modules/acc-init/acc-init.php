@@ -23,25 +23,25 @@ function acc_init_instructions() {
 }
 
 function acc_add_goods() {
-    include_once( MixFS_PATH . 'modules/acc-input/add-goods.php' );
+    include_once( 'add-goods.php' );
 }
 
 function acc_add_stuff() {
-    include_once( MixFS_PATH . 'modules/acc-input/add-stuff.php' );
+    include_once( 'add-stuff.php' );
 }
 
 function acc_add_fee() {
-    include_once( MixFS_PATH . 'modules/acc-input/add-fee.php' );
+    include_once( 'add-fee.php' );
 }
 
 function acc_add_place() {
-    include_once( MixFS_PATH . 'modules/acc-input/add-place.php' );
+    include_once( 'add-place.php' );
 }
 
 function acc_add_container() {
-    include_once( MixFS_PATH . 'modules/acc-input/add-container.php' );
+    include_once( 'add-container.php' );
 }
 
 function acc_add_provider() {
-    include_once( MixFS_PATH . 'modules/acc-input/add-provider.php' );
+    include_once( 'add-provider.php' );
 }

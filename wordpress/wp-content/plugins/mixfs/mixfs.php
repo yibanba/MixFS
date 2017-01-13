@@ -48,6 +48,8 @@ final class MixFS {
         add_action('init', array($this, 'sessionStart'), 1);
         add_action('wp_logout', array($this, 'sessionEnd'));
         add_action('wp_login', array($this, 'sessionEnd'));
+        
+        add_action('init', array($this, 'init'), 0);
 
         add_filter('template_include', array($this, 'template_loader'));
         add_filter('plugin_action_links', array($this, 'plugin_action_links'));
@@ -150,6 +152,19 @@ final class MixFS {
                 $template = Mix_PATH . 'core/templates/' . $file;
         }
         return $template;
+    }
+    
+    public function init() {
+        add_action('admin_enqueue_scripts', array($this, 'date_scripts'));
+    }
+
+    public function date_scripts() {
+
+        wp_register_script('s1', MixFS_URL . 'core/assets/jquery-ui.min.js' );
+        wp_enqueue_script('s1');
+
+        wp_register_style('c2', MixFS_URL . 'core/assets/jquery-ui.min.css', array(), '1.2', 'all');
+        wp_enqueue_style('c2');
     }
 
 }
