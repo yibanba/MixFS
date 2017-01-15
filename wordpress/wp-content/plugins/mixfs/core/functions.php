@@ -6,17 +6,18 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 /**
  * 判断账套表是否存在
  */
+
 function table_name_exists($acc_prefix) {
     global $wpdb;
-    
+
     $acc_names = $wpdb->get_results("SELECT ma_tbl_prefix FROM {$wpdb->prefix}mixfs_accounts", ARRAY_N);
-    
+
     foreach ($acc_names as $name) {
-        if( $acc_prefix == $name[0]) {
+        if ($acc_prefix == $name[0]) {
             return TRUE;    // 表名存在
         }
     }
-    
+
     return FALSE;
 }
 
@@ -43,7 +44,7 @@ function id2name($field_name, $table, $source_id, $tbl_id) {
     $name = $wpdb->get_var("SELECT {$field_name} FROM {$table} WHERE {$tbl_id}='{$source_id}'");
 
     return $name;
- }
+}
 
 /**
  * 
@@ -73,6 +74,7 @@ function mixfs_create_page($slug, $option, $page_title = '', $page_content = '',
     $page_id = wp_insert_post($page_data);
     update_option($option, $page_id);
 }
+
 /**
  * 
  * 创建数据库表: wp_mixfs_xxx
@@ -98,10 +100,10 @@ function mixfs_table_install($tbl_name, $tbl_schema) {
  * 默认 1 个参数设置
  * 参数为 <input id="tag_from" name="tag_from">
  */
-function date_from_to($tag_from, $tag_to='') {
-    
-    if( '' == $tag_to ) {
-        
+function date_from_to($tag_from, $tag_to = '') {
+
+    if ('' == $tag_to) {
+
         echo <<<DateJS
 <script type="text/javascript">
 jQuery(document).ready(function($) {
@@ -119,9 +121,8 @@ jQuery(document).ready(function($) {
 });
 </script>
 DateJS;
-                
     } else {
-        
+
         echo <<<DateJS
 <script type="text/javascript">
 jQuery(document).ready(function($) {
@@ -148,9 +149,10 @@ jQuery(document).ready(function($) {
 });
 </script>
 DateJS;
-        }
-        
-} // date_from_to
+    }
+}
+
+// date_from_to
 
 /**
  * 自动提示补全文本框
@@ -193,29 +195,32 @@ jQuery(document).ready(function($) {
     }).dblclick(function () {
         $(this).catcomplete('search', '');
     });
+    $( "#{$tag}" ).click(function(){  
+     $(this).val("");
+    });
 });
 </script>
 autoJS;
-    
-} // autocompletejs
+}
 
+// autocompletejs
 
 /**
  * 所有页面输出的框架
  * 顶部：mixfs_top()
  * 底部：mixfs_bottom()
  */
-function mixfs_top($title, $acc_name='') {
+function mixfs_top($title, $acc_name = '') {
     $url_entrance = admin_url('admin.php?page=mixfs-entrance'); // 所有页面共用的返回入口链接URL == mixfs-entrance
-    
+
     $html = '<div class="wrap">'
             . '<div id="icon-themes" class="icon32"><br></div>'
-            .   '<h2 class="nav-tab-wrapper">';
-    
-    if( $_GET['page'] == 'mixfs-entrance') {
+            . '<h2 class="nav-tab-wrapper">';
+
+    if ($_GET['page'] == 'mixfs-entrance') {
         $html .= '<a href="' . $url_entrance . '" class="nav-tab nav-tab-active">财务软件入口</a>';
     } else {
-        if( ! isset($_SESSION['acc_tbl']) and ! isset($_SESSION['acc_name']) ) {
+        if (!isset($_SESSION['acc_tbl']) and ! isset($_SESSION['acc_name'])) {
             echo "<script type='text/javascript'>location.href='$url_entrance'</script>";
             exit();
         }
@@ -224,8 +229,32 @@ function mixfs_top($title, $acc_name='') {
     }
 
     echo $html . '<a href="' . wp_logout_url() . '" class="nav-tab">退出软件</a></h2>'
-            . '<br />';
+    . '<br />';
 }
+
+/**
+ * MixPage 底部代码 + JS(选中行高亮)
+ * 
+ */
 function mixfs_bottom() {
-    echo '</div>';
-}
+    ?>
+    </div>
+
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+            if ($(".alternate").length > 0) {
+                var bg = '';
+                $(".alternate:odd").css("background-color", "#F7F7F7");
+
+                $(".alternate").mouseover(function () {
+                    bg = $(this).css("background-color");
+                    $(this).css("background-color", "lightblue");
+                });
+                $(".alternate").mouseout(function () {
+                    $(this).css("background-color", bg);
+                });
+            }
+        });
+    </script>
+
+<?php } ?>

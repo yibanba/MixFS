@@ -1,5 +1,6 @@
 <?php
-if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!defined('ABSPATH'))
+    exit; // Exit if accessed directly
 
 mixfs_top('原材料业务', $_SESSION['acc_name']);
 
@@ -9,6 +10,9 @@ $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
 
 if (isset($_POST['stuffbiz_1'])) {
 
+    $_SESSION['stuffbiz']['date']=0;
+    $_SESSION['stuffbiz']['inout']=0;
+    
     $date_arr = explode('-', $_POST['stuffbiz_date']);
     if (count($date_arr) == 3 && checkdate($date_arr[1], $date_arr[2], $date_arr[0])) {
         $_SESSION['stuffbiz']['date'] = $_POST['stuffbiz_date'];
@@ -24,29 +28,25 @@ if (isset($_POST['stuffbiz_1'])) {
     if ($_SESSION['stuffbiz']['date'] && $_SESSION['stuffbiz']['inout']) {
         echo "<script type='text/javascript'>location.href=location.href + '&stuffpage=2';</script>";
     }
-    
 } // if (isset($_POST['stuffbiz_1']))
-
 elseif (isset($_POST['stuffbiz_2'])) {
     $stuff_name = $wpdb->get_var("SELECT sn_id FROM {$acc_prefix}stuff_name WHERE sn_name = '{$_POST['stuffbiz_name']}'");
-    $stuff_num = is_numeric($_POST['stuffbiz_num'])? $_POST['stuffbiz_num'] : 0;
+    $stuff_num = is_numeric($_POST['stuffbiz_num']) ? $_POST['stuffbiz_num'] : 0;
     $in_out = ($_SESSION['stuffbiz']['inout'] == '入库') ? 'sb_in' : ( ($_SESSION['stuffbiz']['inout'] == '出库') ? 'sb_out' : 0);
-    if($stuff_name && $stuff_num && $in_out ) {
-        $wpdb->insert( $acc_prefix . 'stuff_biz', 
-                array('sb_date' => $_SESSION['stuffbiz']['date'],
-                    $in_out => $stuff_num,
-                    'sb_money' => trim($_POST['stuffbiz_money']),
-                    'sb_p_id' => $_POST['stuffbiz_provider'],
-                    'sb_c_id' => $_POST['stuffbiz_container'],
-                    'sb_summary' => trim($_POST['stuffbiz_sum']),
-                    'sb_sn_id' => $stuff_name
-                    )
-        ); 
+    if ($stuff_name && $stuff_num && $in_out) {
+        $wpdb->insert($acc_prefix . 'stuff_biz', array('sb_date' => $_SESSION['stuffbiz']['date'],
+            $in_out => $stuff_num,
+            'sb_money' => trim($_POST['stuffbiz_money']),
+            'sb_p_id' => $_POST['stuffbiz_provider'],
+            'sb_c_id' => $_POST['stuffbiz_container'],
+            'sb_summary' => trim($_POST['stuffbiz_sum']),
+            'sb_sn_id' => $stuff_name
+                )
+        );
         echo "<div id='message' class='updated'><p>提交【{$_POST['stuffbiz_name']}】原材料业务成功</p></div>";
     } else {
         echo "<div id='message' class='updated'><p>请完成(必填)选项后再提交</p></div>";
     }
-    
 } // elseif (isset($_POST['stuffbiz_2']))
 
 
@@ -73,8 +73,8 @@ if (!isset($_GET['stuffpage'])) {
         </table>
 
         <p class="submit">
-            <input type="submit" name="stuffbiz_1" id="stuffbiz_1" class="button button-primary" value="继续下页" />
-            <input type="reset" name="stuffbiz_reset" id="stuffbiz_reset" class="button button-primary" value="清空内容" />
+            <input type="submit" name="stuffbiz_1" id="stuffbiz_1" class="button button-primary" value="下 一 步" />
+            <input type="reset" name="stuffbiz_reset" id="stuffbiz_reset" class="button button-primary" value="重新填写" />
         </p>
     </form>
 
@@ -156,7 +156,7 @@ elseif ($_GET['stuffpage'] == 2) {
             <input type="submit" name="stuffbiz_2" id="stuffbiz_2" class="button button-primary" value="提交业务" />
             <input type="reset" name="stuffbiz_r" id="stuffbiz_r" class="button button-primary" value="清空内容" />
             <input type="button" name="stuffbiz_return" id="stuffbiz_return" class="button button-primary" value="返回上级" 
-                   onclick="location.href=location.href.substring(0, location.href.indexOf('&stuff'))" />
+                   onclick="location.href = location.href.substring(0, location.href.indexOf('&stuff'))" />
         </p>
     </form>
 
