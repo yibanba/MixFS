@@ -83,8 +83,8 @@ function create_factory_tables($tbl_prefix) {
         "CREATE TABLE IF NOT EXISTS `{$tbl_prefix}_goods_biz` (
             `gb_id` int(9) NOT NULL AUTO_INCREMENT,
             `gb_date` date NOT NULL,
-            `gb_in_place` int(9) DEFAULT '0',
-            `gb_out_place` int(9) DEFAULT '0',
+            `gb_in_place` int(9) DEFAULT NULL,
+            `gb_out_place` int(9) DEFAULT NULL,
             `gb_num` int(11) NOT NULL,
             `gb_money` decimal(12,2) DEFAULT '0.00',
             `gb_summary` varchar(100) DEFAULT NULL,

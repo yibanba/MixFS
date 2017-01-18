@@ -195,7 +195,7 @@ jQuery(document).ready(function($) {
     }).dblclick(function () {
         $(this).catcomplete('search', '');
     });
-    $( "#{$tag}" ).click(function(){  
+    $( "#{$tag}" ).focus(function(){  
      $(this).val("");
     });
 });

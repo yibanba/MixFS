@@ -1,168 +1,154 @@
 <?php
-
 if (!defined('ABSPATH'))
     exit; // Exit if accessed directly
 
-mixfs_top('费用业务', $_SESSION['acc_name']);
+mixfs_top('资金往来业务', $_SESSION['acc_name']);
 
 global $wpdb;
 
-//$_SESSION['emaill'] = 'abc';
-
 $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
 
-if (isset($_POST['email'])) {
-    $_SESSION['emaill'] = $_POST['email'];
-}
-echo '1: ' . $_SESSION['emaill'] . '2<br />';
+if (isset($_POST['feebiz_submit'])) {
+
+    $_SESSION['feebiz']['date'] = '';
+
+    $date_arr = explode('-', $_POST['feebiz_date']);
+    if (count($date_arr) == 3 && checkdate($date_arr[1], $date_arr[2], $date_arr[0])) {
+        $_SESSION['feebiz']['date'] = $_POST['feebiz_date'];
+    }
+
+    $fi_fields = $wpdb->get_row("SELECT fi_id, fi_in_out FROM {$acc_prefix}fee_item WHERE fi_name = '{$_POST['feebiz_item']}'", ARRAY_A);
+    $fee_item_id = $fi_fields['fi_id'];    
+    $in_out = ($fi_fields['fi_in_out'] == '1') ? 'fb_in' : 'fb_out';
+    if ($fee_item_id && is_numeric(trim($_POST['feebiz_money'])) && $_SESSION['feebiz']['date']) {
+        $wpdb->insert($acc_prefix . 'fee_biz', array('fb_date' => $_SESSION['feebiz']['date'],
+            $in_out => trim($_POST['feebiz_money']),
+            'fb_c_id' => $_POST['feebiz_container'],
+            'fb_summary' => trim($_POST['feebiz_sum']),
+            'fb_fi_id' => $fee_item_id
+                )
+        );
+        echo "<div id='message' class='updated'><p>提交【{$_POST['feebiz_item']}】资金往来项目成功</p></div>";
+    } else {
+        echo "<div id='message' class='updated'><p>请正确完成(必填)选项后再提交</p></div>";
+    }
+} // if (isset($_POST['feebiz_submit']))
+
+
+date_from_to("feebiz_date");
 ?>
 
-<script>
-    jQuery(document).ready(function ($) {
-        var dialog, form,
-                // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
-                emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
-                name = $("#name"),
-                email = $("#email"),
-                password = $("#password"),
-                allFields = $([]).add(name).add(email).add(password),
-                tips = $(".validateTips");
+<form action="" method="post" name="createuser" id="createuser" class="validate">
 
-        function updateTips(t) {
-            tips
-                    .text(t)
-                    .addClass("ui-state-highlight");
-            setTimeout(function () {
-                tips.removeClass("ui-state-highlight", 1500);
-            }, 500);
-        }
-
-        function checkLength(o, n, min, max) {
-            if (o.val().length > max || o.val().length < min) {
-                o.addClass("ui-state-error");
-                updateTips("Length of " + n + " must be between " +
-                        min + " and " + max + ".");
-                return false;
-            } else {
-                return true;
-            }
-        }
-
-        function checkRegexp(o, regexp, n) {
-            if (!(regexp.test(o.val()))) {
-                o.addClass("ui-state-error");
-                updateTips(n);
-                return false;
-            } else {
-                return true;
-            }
-        }
-
-        function addUser() {
-            var valid = true;
-            allFields.removeClass("ui-state-error");
-
-            valid = valid && checkLength(name, "username", 3, 16);
-            valid = valid && checkLength(email, "email", 6, 80);
-            valid = valid && checkLength(password, "password", 5, 16);
-
-            valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
-            valid = valid && checkRegexp(email, emailRegex, "eg. ui@jquery.com");
-            valid = valid && checkRegexp(password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9");
-
-            if (valid) {
-                $("#users tbody").append("<tr>" +
-                        "<td>" + name.val() + "</td>" +
-                        "<td>" + email.val() + "</td>" +
-                        "<td>" + password.val() + "</td>" +
-                        "</tr>");
-                dialog.dialog("close");
-            }
-            return valid;
-        }
-
-        dialog = $("#dialog-form").dialog({
-            autoOpen: false,
-            height: 400,
-            width: 350,
-            modal: true,
-            buttons: {
-                "Create an account": addUser,
-                Cancel: function () {
-                    dialog.dialog("close");
-                },
-                "提交": function () {
-                    form[0].submit();
-                }
-            },
-            close: function () {
-                form[ 0 ].reset();
-                allFields.removeClass("ui-state-error");
-            }
-        });
-
-        form = dialog.find("form").on("submit", function (event) {
-            event.preventDefault();
-            addUser();
-        });
-
-        $("#create-user").button().on("click", function () {
-            dialog.dialog("open");
-        });
-    });
-</script>
-
-<div id="dialog-form" title="Create new user">
-    <p class="validateTips">All form fields are required.</p>
-
-    <form action="" method="post" id="mixf">
-        <fieldset>
-            <label for="name">Name</label>
-            <input type="text" name="name" id="name" value="Jane Smith" class="text ui-widget-content ui-corner-all">
-            <label for="email">Email</label>
-            <input type="text" name="email" id="email" value="jane@smith.com" class="text ui-widget-content ui-corner-all">
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" value="xxxxxxx" class="text ui-widget-content ui-corner-all">
-
-            <!-- Allow form submission with keyboard without duplicating the dialog button -->
-            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-        </fieldset>
-    </form>
-</div>
-
-
-<div id="users-contain" class="ui-widget">
-    <h1>Existing Users:</h1>
-    <table id="users" class="ui-widget ui-widget-content">
-        <thead>
-            <tr class="ui-widget-header ">
-                <th>Name</th>
-                <th>Email</th>
-                <th>Password</th>
-            </tr>
-        </thead>
+    <table class="form-table">
         <tbody>
-            <tr>
-                <td>John Doe</td>
-                <td>john.doe@example.com</td>
-                <td>johndoe1</td>
+            <tr class="form-field form-required">
+                <th scope="row"><label for="feebiz_date">选择业务日期 <span class="description">(必填)</span></label></th>
+                <td><input name="feebiz_date" type="text" id="feebiz_date" value="<?php echo $_SESSION['feebiz']['date']; ?>" aria-required="true"></td>
+            </tr>
+            <tr class="form-field">
+                <th scope="row"><label for="feebiz_item">费用项目名称 (必填)</label></th>
+                <td><input type="text" name="feebiz_item" id="feebiz_item" value="双击选择或输入关键字"></td>
+            </tr>
+            <?php
+            // 自动完成文本框，选择费用名称
+            $fee_cols = $wpdb->get_results("SELECT fs_name, fi_name, fi_id FROM {$acc_prefix}fee_item, {$acc_prefix}fee_series "
+                    . " WHERE fi_fs_id=fs_id ORDER BY fi_fs_id, fi_name", ARRAY_A);
+
+            $cols_str = '';
+            foreach ($fee_cols as $value) {
+                $cols_str .= '{ label: "' . $value['fi_name'] . '", category: "' . $value['fs_name'] . ' 总分类"},';
+            }
+            $cols_format = rtrim($cols_str, ',');
+
+            autocompletejs($cols_format, 'feebiz_item');
+            ?>
+            <tr class="form-field">
+                <th scope="row"><label for="feebiz_money">金额 (必填数字)</label></th>
+                <td><input name="feebiz_money" type="text" id="feebiz_money" value=""></td>
+            </tr>
+            <tr class="form-field">
+                <th scope="row"><label for="feebiz_container">货柜号</label></th>
+                <td>
+                    <select name="feebiz_container" id="feebiz_container" style="width: 25em;">
+                        <option selected="selected" value="0">请选择货柜号</option>
+                        <?php
+                        $containers = $wpdb->get_results("SELECT c_id, c_no FROM {$acc_prefix}container ORDER BY c_no", ARRAY_A);
+                        foreach ($containers as $c) {
+                            printf('<option value="%d">%s</option>', $c['c_id'], $c['c_no']);
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
+            <tr class="form-field">
+                <th scope="row"><label for="feebiz_sum">业务摘要</label></th>
+                <td><input name="feebiz_sum" type="text" id="feebiz_sum" value=""></td>
             </tr>
         </tbody>
     </table>
-</div>
-<button id="create-user">Create new user</button>
 
+    <p class="submit">
+        <input type="submit" name="feebiz_submit" id="feebiz_submit" class="button button-primary" value="提交业务" />
+        <input type="reset" name="feebiz_r" id="feebiz_r" class="button button-primary" value="清空内容" />
+    </p>
+</form>
 
 <?php
 
-//    $get_cols = $wpdb->get_results( "SELECT gn_name, gs_name, gn_id FROM {$acc_prefix}goods_name, {$acc_prefix}goods_series "
-//    . " WHERE gn_gs_id=gs_id ORDER BY gn_gs_id, gn_name", ARRAY_A );
-//
-//    $cols_str = '';
-//    foreach ($get_cols as $value) {
-//        $cols_str .= '{ label: "' . $value['gn_name'] . '", category: "' . $value['gs_name'] . '"},';
-//    }
-//    $cols_format = rtrim($cols_str, ',');
+/**
+ * 资金往来业务列表
+ */
+echo <<<Form_HTML
+        <table class="wp-list-table widefat fixed users" cellspacing="1">
+            <thead>
+                <tr>
+                    <th class='manage-column' style="">流水号</th>
+                    <th class='manage-column' style="">日期</th>
+                    <th class='manage-column'  style="">总分类</th>
+                    <th class='manage-column'  style="">明细项目</th>
+                    <th class='manage-column'  style="">现金增加</th>
+                    <th class='manage-column'  style="">现金减少</th>
+                    <th class='manage-column'  style="">货柜号</th>
+                    <th class='manage-column'  style="">业务摘要</th>
+                </tr>
+            </thead>
 
+            <tfoot>
+                <tr>
+                    <th class='manage-column' style="">流水号</th>
+                    <th class='manage-column' style="">日期</th>
+                    <th class='manage-column'  style="">总分类</th>
+                    <th class='manage-column'  style="">明细项目</th>
+                    <th class='manage-column'  style="">现金增加</th>
+                    <th class='manage-column'  style="">现金减少</th>
+                    <th class='manage-column'  style="">货柜号</th>
+                    <th class='manage-column'  style="">业务摘要</th>
+                </tr>
+            </tfoot>
+
+            <tbody>
+Form_HTML;
+
+$results_feebiz = $wpdb->get_results("SELECT fb_id, fb_date, fs_name, fi_name, fb_in, fb_out, fb_c_id, fb_summary "
+        . " FROM {$acc_prefix}fee_biz, {$acc_prefix}fee_item, {$acc_prefix}fee_series "
+        . " WHERE fi_fs_id = fs_id AND fb_fi_id = fi_id ORDER BY fb_id DESC LIMIT 10 ", ARRAY_A);
+
+foreach ($results_feebiz as $fb) {
+    $container = id2name("c_no", "{$acc_prefix}container", $fb['fb_c_id'], "c_id");
+    $in = ($fb['fb_in'] == 0) ? '' : number_format($fb['fb_in'], 2);
+    $out = ($fb['fb_out'] == 0) ? '' : number_format($fb['fb_out'], 2);
+    echo "<tr class='alternate'>
+                <td class='name'>{$fb['fb_id']}</td>
+                <td class='name'>{$fb['fb_date']}</td>
+                <td class='name'>{$fb['fs_name']}</td>
+                <td class='name'>{$fb['fi_name']}</td>
+                <td class='name'>{$in}</td>
+                <td class='name'>{$out}</td>
+                <td class='name'>{$container}</td>
+                <td class='name'>{$fb['fb_summary']}</td>
+            </tr>";
+}
+echo '</tbody></table>';
 
 mixfs_bottom(); // 框架页面底部

@@ -10,7 +10,7 @@ $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
 
 if (isset($_POST['stuffbiz_1'])) {
 
-    $_SESSION['stuffbiz']['date']=0;
+    $_SESSION['stuffbiz']['date']='';
     $_SESSION['stuffbiz']['inout']=0;
     
     $date_arr = explode('-', $_POST['stuffbiz_date']);
