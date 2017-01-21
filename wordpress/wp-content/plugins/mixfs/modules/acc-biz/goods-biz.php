@@ -51,8 +51,8 @@ elseif (isset($_POST['goodsbiz_submit'])) {
     if ($_SESSION['goodsbiz']['inout'] == '入库') {
         if ($goods_name && $goods_num) {
             $wpdb->insert($acc_prefix . 'goods_biz', array('gb_date' => $_SESSION['goodsbiz']['date'],
-                'gb_in_place' => $_SESSION['goodsbiz']['in'],
-                'gb_num' => $goods_num,
+                'gb_gp_id' => $_SESSION['goodsbiz']['in'],
+                'gb_in' => $goods_num,
                 'gb_summary' => trim($_POST['goodsbiz_sum']),
                 'gb_gn_id' => $goods_name
                     )
@@ -62,11 +62,11 @@ elseif (isset($_POST['goodsbiz_submit'])) {
             echo "<div id='message' class='updated'><p>请完成(必填)选项后再提交</p></div>";
         }
     } elseif ($_SESSION['goodsbiz']['inout'] == '销售或退回') {
-        $money = trim($_POST['goodsbiz_money']);
+        $money = number_format(trim($_POST['goodsbiz_money']), 2);
         if ($goods_name && $goods_num && is_numeric($money)) {
             $wpdb->insert($acc_prefix . 'goods_biz', array('gb_date' => $_SESSION['goodsbiz']['date'],
-                'gb_out_place' => $_SESSION['goodsbiz']['out'],
-                'gb_num' => $goods_num,
+                'gb_gp_id' => $_SESSION['goodsbiz']['out'],
+                'gb_out' => $goods_num,
                 'gb_money' => $money,
                 'gb_summary' => trim($_POST['goodsbiz_sum']),
                 'gb_gn_id' => $goods_name
@@ -78,13 +78,19 @@ elseif (isset($_POST['goodsbiz_submit'])) {
         }
     } elseif ($_SESSION['goodsbiz']['inout'] == '移库') {
         if ($goods_name && $goods_num) {
-            $wpdb->insert($acc_prefix . 'goods_biz', array('gb_date' => $_SESSION['goodsbiz']['date'],
-                'gb_in_place' => $_SESSION['goodsbiz']['in'],
-                'gb_out_place' => $_SESSION['goodsbiz']['out'],
-                'gb_num' => $goods_num,
-                'gb_summary' => trim($_POST['goodsbiz_sum']),
-                'gb_gn_id' => $goods_name
-                    )
+            $wpdb->insert($acc_prefix . 'goods_biz', 
+                array('gb_date' => $_SESSION['goodsbiz']['date'],
+                    'gb_gp_id' => $_SESSION['goodsbiz']['out'],
+                    'gb_out' => $goods_num,
+                    'gb_summary' => trim($_POST['goodsbiz_sum']),
+                    'gb_gn_id' => $goods_name )
+            );
+            $wpdb->insert($acc_prefix . 'goods_biz', 
+                array('gb_date' => $_SESSION['goodsbiz']['date'],
+                    'gb_gp_id' => $_SESSION['goodsbiz']['in'],
+                    'gb_in' => $goods_num,
+                    'gb_summary' => trim($_POST['goodsbiz_sum']),
+                    'gb_gn_id' => $goods_name)
             );
             echo "<div id='message' class='updated'><p>提交【{$_POST['goodsbiz_name']}】产成品业务成功</p></div>";
         } else {
@@ -299,65 +305,33 @@ function goodsbiz_list($acc_prefix, $total = 10) {
 Form_HTML;
 
 // 产成品业务列表
-    $results_goodsbiz = $wpdb->get_results("SELECT gb_id, gb_date, gs_name, gn_name, gb_in_place, gb_out_place, gb_num, gb_money, gb_summary "
+    $results_goodsbiz = $wpdb->get_results("SELECT gb_id, gb_date, gs_name, gn_name, gb_in, gb_out, gb_money, gb_gp_id, gb_summary "
             . " FROM {$acc_prefix}goods_biz, {$acc_prefix}goods_name, {$acc_prefix}goods_series "
             . " WHERE gb_gn_id = gn_id AND gn_gs_id = gs_id "
             . " ORDER BY gb_id DESC LIMIT 10 ", ARRAY_A);
 
     foreach ($results_goodsbiz as $gb) {
-        $in_place = id2name("gp_name", "{$acc_prefix}goods_place", $gb['gb_in_place'], "gp_id");
-        $out_place = id2name("gp_name", "{$acc_prefix}goods_place", $gb['gb_out_place'], "gp_id");
-        $number = number_format($gb['gb_num'], 0);
+        $place = id2name("gp_name", "{$acc_prefix}goods_place", $gb['gb_gp_id'], "gp_id");
+        $in_number =  ( $gb['gb_in'] == 0 ) ?  '' : number_format($gb['gb_in'], 0);
+        $out_number = ( $gb['gb_out'] == 0 ) ?  '' : number_format($gb['gb_out'], 0);
         $money = ($gb['gb_money'] == 0) ? '' : number_format($gb['gb_money'], 2);
-        if ($gb['gb_in_place'] > 0 && $gb['gb_out_place'] > 0) {
-            echo "<tr class='alternate'>
-                    <td class='name'>{$gb['gb_id']}</td>
-                    <td class='name'>{$gb['gb_date']}</td>
-                    <td class='name'>{$gb['gs_name']}</td>
-                    <td class='name'>{$gb['gn_name']}</td>
-                    <td class='name'>{$out_place}</td>
-                    <td class='name'></td>
-                    <td class='name'>{$number}</td>
-                    <td class='name'>{$money}</td>
-                    <td class='name'>{$gb['gb_summary']}</td>
-                </tr><tr class='alternate'>
-                    <td class='name'>{$gb['gb_id']}</td>
-                    <td class='name'>{$gb['gb_date']}</td>
-                    <td class='name'>{$gb['gs_name']}</td>
-                    <td class='name'>{$gb['gn_name']}</td>
-                    <td class='name'>{$in_place}</td>
-                    <td class='name'>{$number}</td>
-                    <td class='name'></td>
-                    <td class='name'>{$money}</td>
-                    <td class='name'>{$gb['gb_summary']}</td>
-                </tr>";
-        } else {
-            if ($gb['gb_in_place'] > 0) {
-                $in = $number;
-                $out = '';
-            } elseif ($gb['gb_out_place'] > 0) {
-                $in = '';
-                $out = $number;
-            }
-            $place = $in_place . $out_place; // 其中一个为空
             echo "<tr class='alternate'>
                     <td class='name'>{$gb['gb_id']}</td>
                     <td class='name'>{$gb['gb_date']}</td>
                     <td class='name'>{$gb['gs_name']}</td>
                     <td class='name'>{$gb['gn_name']}</td>
                     <td class='name'>{$place}</td>
-                    <td class='name'>{$in}</td>
-                    <td class='name'>{$out}</td>
+                    <td class='name'>{$in_number}</td>
+                    <td class='name'>{$out_number}</td>
                     <td class='name'>{$money}</td>
                     <td class='name'>{$gb['gb_summary']}</td>
                 </tr>";
-        }
     } // foreach ($results_goodsbiz as $gb)
 
     echo '</tbody></table>';
-}
 
-// function goodsbiz_list($total = 10)
+    
+} // function goodsbiz_list($total = 10)
 
 /**
  * 生成仓库、店铺 下拉框

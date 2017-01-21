@@ -103,56 +103,51 @@ function mixfs_table_install($tbl_name, $tbl_schema) {
 function date_from_to($tag_from, $tag_to = '') {
 
     if ('' == $tag_to) {
-
         echo <<<DateJS
 <script type="text/javascript">
-jQuery(document).ready(function($) {
-    $( "#{$tag_from}" ).datepicker({
-        defaultDate: "-1M",
-        numberOfMonths: 2,
-        minDate: new Date(2015, 1 - 1, 1),
-        maxDate: "+1d",
-        monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
-        dayNamesMin: [ "日","一","二","三","四","五","六" ],
-        onClose: function( selectedDate ) {
-            $( "#{$tag_from}" ).datepicker( "option", "dateFormat", "yy-mm-dd" );
-        }
+    jQuery(document).ready(function($) {
+        $( "#{$tag_from}" ).datepicker({
+            defaultDate: "-1M",
+            numberOfMonths: 2,
+            minDate: new Date(2015, 1 - 1, 1),
+            maxDate: "+1d",
+            monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
+            dayNamesMin: [ "日","一","二","三","四","五","六" ],
+            dateFormat: "yy-mm-dd"
+        });
     });
-});
 </script>
 DateJS;
     } else {
 
         echo <<<DateJS
 <script type="text/javascript">
-jQuery(document).ready(function($) {
-    $( "#{$tag_from}" ).datepicker({
-      defaultDate: "-1M",
-      numberOfMonths: 2,
-        monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
-        dayNamesMin: [ "日","一","二","三","四","五","六" ],
-      onClose: function( selectedDate ) {
-        $( "#{$tag_to}" ).datepicker( "option", "minDate", selectedDate );
-        $( "#{$tag_from}" ).datepicker( "option", "dateFormat", "yy-mm-dd" );
-      }
+    jQuery(document).ready(function($) {
+        $( "#{$tag_from}" ).datepicker({
+          defaultDate: "-1M",
+          numberOfMonths: 2,
+            monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
+            dayNamesMin: [ "日","一","二","三","四","五","六" ],
+            dateFormat: "yy-mm-dd",
+          onClose: function( selectedDate ) {
+            $( "#{$tag_to}" ).datepicker( "option", "minDate", selectedDate );
+          }
+        });
+        $( "#{$tag_to}" ).datepicker({
+            defaultDate: "-1M",
+            numberOfMonths: 2,
+            monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
+            dayNamesMin: [ "日","一","二","三","四","五","六" ],
+            dateFormat: "yy-mm-dd",
+            onClose: function( selectedDate ) {
+                $( "#{$tag_from}" ).datepicker( "option", "maxDate", selectedDate );
+            }
+        });
     });
-    $( "#{$tag_to}" ).datepicker({
-        defaultDate: "-1M",
-        numberOfMonths: 2,
-        monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
-        dayNamesMin: [ "日","一","二","三","四","五","六" ],
-        onClose: function( selectedDate ) {
-            $( "#{$tag_from}" ).datepicker( "option", "maxDate", selectedDate );
-            $( "#{$tag_to}" ).datepicker( "option", "dateFormat", "yy-mm-dd" );
-        }
-    });
-});
 </script>
 DateJS;
     }
-}
-
-// date_from_to
+} // date_from_to
 
 /**
  * 自动提示补全文本框

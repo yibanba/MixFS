@@ -83,17 +83,18 @@ function create_factory_tables($tbl_prefix) {
         "CREATE TABLE IF NOT EXISTS `{$tbl_prefix}_goods_biz` (
             `gb_id` int(9) NOT NULL AUTO_INCREMENT,
             `gb_date` date NOT NULL,
-            `gb_in_place` int(9) DEFAULT NULL,
-            `gb_out_place` int(9) DEFAULT NULL,
-            `gb_num` int(11) NOT NULL,
+            `gb_in` int(9) DEFAULT '0',
+            `gb_out` int(9) DEFAULT '0',
             `gb_money` decimal(12,2) DEFAULT '0.00',
+            `gb_gp_id` int(9) NOT NULL,
             `gb_summary` varchar(100) DEFAULT NULL,
             `gb_gn_id` int(9) NOT NULL,
             PRIMARY KEY (`gb_id`),
             KEY `gb_date` (`gb_date`),
+            KEY `gb_gp_id` (`gb_gp_id`),
             KEY `gb_gn_id` (`gb_gn_id`),
-            KEY `gb_in` (`gb_in_place`),
-            KEY `gb_out` (`gb_out_place`),
+            KEY `gb_in` (`gb_in`),
+            KEY `gb_out` (`gb_out`),
             KEY `gb_money` (`gb_money`)
           ) $collate;",
         "CREATE TABLE IF NOT EXISTS `{$tbl_prefix}_goods_name` (

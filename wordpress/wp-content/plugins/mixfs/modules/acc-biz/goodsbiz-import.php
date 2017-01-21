@@ -53,14 +53,21 @@ if ($_POST['submit_upload']) {
                 $fn = $upload_dir . '/2007.xlsx';
             }
             $err_num = read_excel($fn, $gn_kv);
-            echo "<div id='message' class='updated'>"
-            . "<p>上传文件名：{$_FILES["file"]["name"]} | 文件大小：" . ($_FILES["file"]["size"] / 1024) . " Kb | 错误数：{$err_num} 行</p>"
-            . "</div>";
-            if($err_num == 0) {
-                input_form();
+            if ($err_num == -1) {
+                echo "<div id='message' class='updated'>"
+                . "<p>上传文件名：{$_FILES["file"]["name"]} | 文件大小：" . ($_FILES["file"]["size"] / 1024) . " Kb | 文件为空，请输入正确的数据后再次提交</p>"
+                . "</div>";
                 $_SESSION['goodsbiz']['file'] = $fn;
             } else {
-                echo "<div id='message' class='updated'><p>请检查并更正报错的业务，包括：多余的符号、空格、大小写、未登记的新产品 ... 要和已登记的(产成品名称)完全一致！</p></div>";
+                echo "<div id='message' class='updated'>"
+                . "<p>上传文件名：{$_FILES["file"]["name"]} | 文件大小：" . ($_FILES["file"]["size"] / 1024) . " Kb | 错误数：{$err_num} 行</p>"
+                . "</div>";
+                if ($err_num == 0) {
+                    input_form();
+                    $_SESSION['goodsbiz']['file'] = $fn;
+                } else {
+                    echo "<div id='message' class='updated'><p>请检查并更正报错的业务，包括：多余的符号、空格、大小写、未登记的新产品 ... 要和已登记的(产成品名称)完全一致！</p></div>";
+                }
             }
         }
     } else {
@@ -70,7 +77,7 @@ if ($_POST['submit_upload']) {
 elseif (isset($_POST['import_file'])) {
 
     $total = input_excel($_SESSION['goodsbiz']['file'], $_SESSION['goodsbiz']['inout'], $gn_kv, $acc_prefix);
-    
+
     echo "<div id='message' class='updated'><p>共成功提交 {$total} 条记录</p></div>";
 }
 ?>
@@ -92,38 +99,39 @@ function input_excel($ver, $biz_type, $gn_kv, $acc_prefix) {
     $row_no = 0;
 
     if ($biz_type == '入库') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in_place`, `gb_num`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_gp_id`, `gb_gn_id`) VALUES ";
         foreach ($sheetData as $value) {
             if ($value['A'] == '品名' && $value['B'] == '数量') {
                 continue;
             } elseif ($value['A'] == '' || $value['B'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}',{$_SESSION['goodsbiz']['in']}, {$value['B']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$value['B']}, {$_SESSION['goodsbiz']['in']}, {$gn_kv[$value['A']]} ),";
             }
             $row_no++;
         }
     } elseif ($biz_type == '移库') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in_place`, `gb_out_place`, `gb_num`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_out`, `gb_gp_id`, `gb_gn_id`) VALUES ";
         foreach ($sheetData as $value) {
             if ($value['A'] == '品名' && $value['B'] == '数量') {
                 continue;
             } elseif ($value['A'] == '' || $value['B'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}',{$_SESSION['goodsbiz']['in']},{$_SESSION['goodsbiz']['out']}, {$value['B']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', 0, {$value['B']}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$value['B']}, 0, {$_SESSION['goodsbiz']['in']}, {$gn_kv[$value['A']]} ),";
             }
             $row_no++;
         }
     } elseif ($biz_type == '销售或退回') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_out_place`, `gb_num`, `gb_money`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_out`, `gb_money`, `gb_gp_id`, `gb_gn_id`) VALUES ";
         foreach ($sheetData as $value) {
             if ($value['A'] == '品名' && $value['B'] == '数量') {
                 continue;
             } elseif ($value['A'] == '' || $value['B'] == '' || $value['C'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$value['C']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$value['B']}, {$value['C']}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$value['A']]} ),";
             }
             $row_no++;
         }
@@ -132,7 +140,6 @@ function input_excel($ver, $biz_type, $gn_kv, $acc_prefix) {
     $wpdb->query($sql_format);
 
     return $row_no;
-
 }
 
 /**
@@ -178,7 +185,7 @@ function read_excel($ver, $gn_kv) {
         }
     }
     echo '</table>';
-    return $err_num;
+    return ($row_no > 2) ? $err_num : (-1);
 }
 
 /**
