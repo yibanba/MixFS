@@ -9,8 +9,8 @@
  * Author URI: http://www.yibanba.com/
  * Author E-mail: yibanba@hotmail.com
  */
-if (!defined('ABSPATH'))
-    exit; // Exit if accessed directly
+
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 /**
  * Mix_PATH     = X:\xxx/mixfs/
@@ -30,10 +30,6 @@ final class MixFS {
 
         if (null === $instance) {
             $instance = new MixFS;
-
-//            $instance->setup_globals();
-//            $instance->includes();
-//            $instance->setup_actions();
         }
 
         return $instance;
@@ -77,7 +73,7 @@ final class MixFS {
     }
 
     /**
-     * 激活插件时的操作
+     * 停用插件时的操作
      */
     public function deactivate() {
         $this->uninstall();
@@ -128,6 +124,10 @@ final class MixFS {
     function install() {
         include_once ( MixFS_PATH . 'core/admin/install.php');
         do_install_core();
+        
+        // 变更网站主页为插件创建的Page：Mix Financial Softeware
+        update_option('show_on_front', 'page');
+        update_option('page_on_front', get_option('mixfs_homepage_id_core'));
     }
 
     /**
@@ -149,7 +149,7 @@ final class MixFS {
         if ($file) {
             $template = locate_template($find);
             if (!$template)
-                $template = Mix_PATH . 'core/templates/' . $file;
+                $template = MixFS_PATH . 'core/templates/' . $file;
         }
         return $template;
     }
@@ -167,9 +167,8 @@ final class MixFS {
         wp_enqueue_style('c2');
     }
 
-}
+} // final class MixFS
 
-// class MixFS
 
 function mixfs() {
     return MixFS::instance();

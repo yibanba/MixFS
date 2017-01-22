@@ -11,7 +11,12 @@ if (!empty($_SESSION['mas'][$_GET['mas']])) {
     mixfs_top('进销存概况', $_SESSION['acc_name']);
 } elseif (isset($_SESSION['acc_tbl']) && isset($_SESSION['acc_name'])) {
     mixfs_top('进销存概况', $_SESSION['acc_name']);
+} else {
+    $url_entrance = admin_url('admin.php?page=mixfs-entrance'); // 所有页面共用的返回入口链接URL == mixfs-entrance
+    echo "<script type='text/javascript'>location.href='$url_entrance'</script>";
+    exit();
 }
+
 global $wpdb;
 
 $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';

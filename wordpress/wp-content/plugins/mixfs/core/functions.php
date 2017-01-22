@@ -206,13 +206,15 @@ autoJS;
  * 底部：mixfs_bottom()
  */
 function mixfs_top($title, $acc_name = '') {
+    global $current_user;
+
     $url_entrance = admin_url('admin.php?page=mixfs-entrance'); // 所有页面共用的返回入口链接URL == mixfs-entrance
 
     $html = '<div class="wrap">'
             . '<div id="icon-themes" class="icon32"><br></div>'
             . '<h2 class="nav-tab-wrapper">';
 
-    if ($_GET['page'] == 'mixfs-entrance') {
+    if ($_GET['page'] == 'mixfs-entrance' || $current_user->roles[0] == 'manage_options') {
         $html .= '<a href="' . $url_entrance . '" class="nav-tab nav-tab-active">财务软件入口</a>';
     } else {
         if (!isset($_SESSION['acc_tbl']) and ! isset($_SESSION['acc_name'])) {

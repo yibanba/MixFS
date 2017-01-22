@@ -1,7 +1,17 @@
 <?php
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
-mixfs_top('权限分配');
+$url_entrance = admin_url('admin.php?page=mixfs-entrance'); // 所有页面共用的返回入口链接URL == mixfs-entrance
+
+$html = '<div class="wrap">'
+        . '<div id="icon-themes" class="icon32"><br></div>'
+        . '<h2 class="nav-tab-wrapper">';
+$html .= '<a href="' . $url_entrance . '" class="nav-tab">财务软件入口</a>';
+$html .= '<a href="' . $url_entrance . '" class="nav-tab nav-tab-active">权限分配</a>';
+
+echo $html . '<a href="' . wp_logout_url() . '" class="nav-tab">退出软件</a></h2><br />';
+
+
 
 global $wpdb;
 if (isset($_POST['btn_add_op'])) {

@@ -1,10 +1,18 @@
 <?php
-
-if (!defined('ABSPATH')) exit; // Exit if accessed directly
+if (!defined('ABSPATH'))
+    exit; // Exit if accessed directly
 
 include_once ( MixFS_PATH . 'core/accounting_schema/factory_schema.php');
 
-mixfs_top( '账套列表' );
+
+$url_entrance = admin_url('admin.php?page=mixfs-entrance'); // 所有页面共用的返回入口链接URL == mixfs-entrance
+$html = '<div class="wrap">'
+        . '<div id="icon-themes" class="icon32"><br></div>'
+        . '<h2 class="nav-tab-wrapper">'
+        . '<a href="' . $url_entrance . '" class="nav-tab">财务软件入口</a>'
+        . '<a href="' . $url_entrance . '" class="nav-tab nav-tab-active">账套列表</a>';
+echo $html . '<a href="' . wp_logout_url() . '" class="nav-tab">退出软件</a></h2><br />';
+
 
 global $wpdb;
 if (isset($_POST['btn_tbl_add'])) {
@@ -26,7 +34,7 @@ if (isset($_POST['btn_tbl_add'])) {
                 'ma_create_md5' => md5($tbl_prefix . get_option('mixfs_md5_week'))
                     )
             ); // md5(lc + 33)
-            create_factory_tables( $wpdb->prefix . 'mixfs_' . $tbl_prefix);
+            create_factory_tables($wpdb->prefix . 'mixfs_' . $tbl_prefix);
             echo '<div id="message" class="updated"><p>添加账套成功</p></div>';
         }
     }
@@ -47,18 +55,16 @@ if (isset($_POST['btn_tbl_add'])) {
                 $old = $wpdb->prefix . 'mixfs_' . $old['ma_tbl_prefix'] . '_';
                 $new = $wpdb->prefix . 'mixfs_' . $tbl_prefix . '_';
                 $counter += update_factory_tables($old, $new);
-                
-                $wpdb->update( $wpdb->prefix . 'mixfs_accounts', 
-                    array(
-                        'ma_tbl_prefix' => $tbl_prefix,
-                        'ma_tbl_name' => $tbl_name,
-                        'ma_tbl_detail' => $tbl_detail,
-                        'ma_create_md5' => md5($tbl_prefix . get_option('mixfs_md5_week')),
-                        'ma_update_date' => current_time('mysql')
-                    ), 
-                    array('ma_id' => $id)
+
+                $wpdb->update($wpdb->prefix . 'mixfs_accounts', array(
+                    'ma_tbl_prefix' => $tbl_prefix,
+                    'ma_tbl_name' => $tbl_name,
+                    'ma_tbl_detail' => $tbl_detail,
+                    'ma_create_md5' => md5($tbl_prefix . get_option('mixfs_md5_week')),
+                    'ma_update_date' => current_time('mysql')
+                        ), array('ma_id' => $id)
                 );
-                            }
+            }
         }
     }
     if ($counter) {
@@ -70,74 +76,74 @@ if (isset($_POST['btn_tbl_add'])) {
 ?>
 
 
-    <form action="" method="post">
-        <div class="manage-menus">
+<form action="" method="post">
+    <div class="manage-menus">
 
-            <div class="alignleft actions">
-                <input type="text" id="tbl_prefix" name="tbl_prefix" value="输入指定账套字母表名..." maxlength="20" size="25" style="color: #ccc;" 
-                       onblur="if (this.value == '') {
-                                   this.value = '输入指定账套字母表名...';
-                                   this.style.color = '#ccc';
-                               }" 
-                       onfocus="if (this.value == '输入指定账套字母表名...') {
-                                   this.value = '';
-                                   this.style.color = '#333';
-                               }" />
-                <input type="text" id="tbl_name" name="tbl_name" value="输入账套中文名称..." maxlength="20" size="25" style="color: #ccc;" 
-                       onblur="if (this.value == '') {
-                                   this.value = '输入账套中文名称...';
-                                   this.style.color = '#ccc';
-                               }" 
-                       onfocus="if (this.value == '输入账套中文名称...') {
-                                   this.value = '';
-                                   this.style.color = '#333';
-                               }" />
-                <input type="text" id="tbl_detail" name="tbl_detail" value="输入备注..." maxlength="20" size="25" style="color: #ccc;" 
-                       onblur="if (this.value == '') {
-                                   this.value = '输入备注...';
-                                   this.style.color = '#ccc';
-                               }" 
-                       onfocus="if (this.value == '输入备注...') {
-                                   this.value = '';
-                                   this.style.color = '#333';
-                               }" />
-                <input type="submit" name="btn_tbl_add" id="btn_tbl_add" class="button" value="添加新账套"  />
-            </div>
-            <br class="clear" />
+        <div class="alignleft actions">
+            <input type="text" id="tbl_prefix" name="tbl_prefix" value="输入指定账套字母表名..." maxlength="20" size="25" style="color: #ccc;" 
+                   onblur="if (this.value == '') {
+                               this.value = '输入指定账套字母表名...';
+                               this.style.color = '#ccc';
+                           }" 
+                   onfocus="if (this.value == '输入指定账套字母表名...') {
+                               this.value = '';
+                               this.style.color = '#333';
+                           }" />
+            <input type="text" id="tbl_name" name="tbl_name" value="输入账套中文名称..." maxlength="20" size="25" style="color: #ccc;" 
+                   onblur="if (this.value == '') {
+                               this.value = '输入账套中文名称...';
+                               this.style.color = '#ccc';
+                           }" 
+                   onfocus="if (this.value == '输入账套中文名称...') {
+                               this.value = '';
+                               this.style.color = '#333';
+                           }" />
+            <input type="text" id="tbl_detail" name="tbl_detail" value="输入备注..." maxlength="20" size="25" style="color: #ccc;" 
+                   onblur="if (this.value == '') {
+                               this.value = '输入备注...';
+                               this.style.color = '#ccc';
+                           }" 
+                   onfocus="if (this.value == '输入备注...') {
+                               this.value = '';
+                               this.style.color = '#333';
+                           }" />
+            <input type="submit" name="btn_tbl_add" id="btn_tbl_add" class="button" value="添加新账套"  />
         </div>
-        <br />
-        <table class="wp-list-table widefat fixed users" cellspacing="1">
-            <thead>
-                <tr>
-                    <th class='manage-column column-cb check-column'  style="width: 50px;">
-                        <input id="cb-select-all-1" type="checkbox" />
-                    </th>
-                    <th class='manage-column' style="width: 300px;">账目数据库表名</th>
-                    <th class='manage-column' style="">账目名称</th>
-                    <th class='manage-column'  style="">信息摘要</th>
-                    <th class='manage-column'  style="">创建账套时间</th>
-                    <th class='manage-column'  style="">账套更新时间</th>
-                </tr>
-            </thead>
+        <br class="clear" />
+    </div>
+    <br />
+    <table class="wp-list-table widefat fixed users" cellspacing="1">
+        <thead>
+            <tr>
+                <th class='manage-column column-cb check-column'  style="width: 50px;">
+                    <input id="cb-select-all-1" type="checkbox" />
+                </th>
+                <th class='manage-column' style="width: 300px;">账目数据库表名</th>
+                <th class='manage-column' style="">账目名称</th>
+                <th class='manage-column'  style="">信息摘要</th>
+                <th class='manage-column'  style="">创建账套时间</th>
+                <th class='manage-column'  style="">账套更新时间</th>
+            </tr>
+        </thead>
 
-            <tfoot>
-                <tr>
-                    <th class='manage-column column-cb check-column'  style="width: 50px;">
-                        <input id="cb-select-all-1" type="checkbox" />
-                    </th>
-                    <th class='manage-column' style="width: 300px;">账目数据库表名</th>
-                    <th class='manage-column' style="">账目名称</th>
-                    <th class='manage-column'  style="">信息摘要</th>
-                    <th class='manage-column'  style="">创建账套时间</th>
-                    <th class='manage-column'  style="">账套更新时间</th>
-                </tr>
-            </tfoot>
+        <tfoot>
+            <tr>
+                <th class='manage-column column-cb check-column'  style="width: 50px;">
+                    <input id="cb-select-all-1" type="checkbox" />
+                </th>
+                <th class='manage-column' style="width: 300px;">账目数据库表名</th>
+                <th class='manage-column' style="">账目名称</th>
+                <th class='manage-column'  style="">信息摘要</th>
+                <th class='manage-column'  style="">创建账套时间</th>
+                <th class='manage-column'  style="">账套更新时间</th>
+            </tr>
+        </tfoot>
 
-            <tbody>
-                <?php
-                $results_accounts = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}mixfs_accounts", ARRAY_A);
-                foreach ($results_accounts as $tbl) :
-                    echo "<tr class='alternate'>
+        <tbody>
+            <?php
+            $results_accounts = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}mixfs_accounts", ARRAY_A);
+            foreach ($results_accounts as $tbl) :
+                echo "<tr class='alternate'>
                         <th scope='row' class='check-column'>
                             <input type='checkbox' name='ma_id[]' class='administrator' value='{$tbl['ma_id']}' />
                         </th>
@@ -159,19 +165,19 @@ if (isset($_POST['btn_tbl_add'])) {
                             {$tbl['ma_update_date']}
                         </td>
                     </tr>";
-                endforeach;
-                ?>
-            </tbody>
-        </table>
+            endforeach;
+            ?>
+        </tbody>
+    </table>
 
-        <div class="tablenav bottom">
+    <div class="tablenav bottom">
 
-            <div class="alignleft actions">
-                <input type="submit" name="btn_tbl_update" id="btn_tbl_update" class="button button-primary" value="提交更新"  />
-            </div>
-            <br class="clear" />
+        <div class="alignleft actions">
+            <input type="submit" name="btn_tbl_update" id="btn_tbl_update" class="button button-primary" value="提交更新"  />
         </div>
-    </form>
+        <br class="clear" />
+    </div>
+</form>
 
 
 <?php mixfs_bottom(); ?>

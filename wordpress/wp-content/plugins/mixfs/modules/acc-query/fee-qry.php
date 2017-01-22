@@ -2,4 +2,4 @@
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
-echo 'cash query';
+echo 'feequery';

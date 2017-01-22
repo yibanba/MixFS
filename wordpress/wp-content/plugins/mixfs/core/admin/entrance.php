@@ -5,6 +5,11 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 mixfs_top('财务软件入口');
 
 
+echo $_SESSION['acc_name'];
+unset($_SESSION['acc_tbl']);
+unset($_SESSION['acc_name']);
+
+echo $_SESSION['acc_name'];
 /**
  * 1. update: md5()
  * 2. create: $_SESSION['mixfs_login_id'] + $_SESSION['mixfs_access list'];
@@ -43,7 +48,7 @@ if ($current_week != $old_week) {
         }
         $("tr").click(function () {
             $(this).find("input[type='radio']").attr("checked", "checked");
-            location.href = "http://mixfs/wordpress/wp-admin/admin.php?page=mixfs-instructions&mas=" + $('input:radio:checked').val();
+            location.href = location.href.substring(0, location.href.indexOf('?page')) + "?page=mixfs-instructions&mas=" + $('input:radio:checked').val();
         })
     });
 </script>

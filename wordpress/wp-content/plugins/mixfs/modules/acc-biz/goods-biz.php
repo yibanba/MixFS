@@ -7,6 +7,7 @@ mixfs_top('产成品业务', $_SESSION['acc_name']);
 global $wpdb;
 
 $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
+$list_total = 15;
 
 if (isset($_POST['goodsbiz_1'])) {
 
@@ -62,7 +63,7 @@ elseif (isset($_POST['goodsbiz_submit'])) {
             echo "<div id='message' class='updated'><p>请完成(必填)选项后再提交</p></div>";
         }
     } elseif ($_SESSION['goodsbiz']['inout'] == '销售或退回') {
-        $money = number_format(trim($_POST['goodsbiz_money']), 2);
+        $money = trim($_POST['goodsbiz_money']);
         if ($goods_name && $goods_num && is_numeric($money)) {
             $wpdb->insert($acc_prefix . 'goods_biz', array('gb_date' => $_SESSION['goodsbiz']['date'],
                 'gb_gp_id' => $_SESSION['goodsbiz']['out'],
@@ -72,6 +73,12 @@ elseif (isset($_POST['goodsbiz_submit'])) {
                 'gb_gn_id' => $goods_name
                     )
             );
+            if($money > 0) {
+                $wpdb->update( $acc_prefix . 'goods_name', 
+                    array( 'gn_price' => number_format(($money/$goods_num),2) ), 
+                    array( 'gn_id' => $goods_name ), 
+                    array( '%.2f' ), array( '%d' ) );
+            }
             echo "<div id='message' class='updated'><p>提交【{$_POST['goodsbiz_name']}】产成品业务成功</p></div>";
         } else {
             echo "<div id='message' class='updated'><p>请完成(必填)选项后再提交</p></div>";
@@ -172,7 +179,7 @@ if (!isset($_GET['goodspage'])) {
         });
     </script>
     <?php
-    goodsbiz_list($acc_prefix, 10);
+    goodsbiz_list($acc_prefix, $list_total);
 } // if (!isset($_GET['goodspage']))
 elseif ($_GET['goodspage'] == 2) {
     ?>
@@ -252,7 +259,7 @@ elseif ($_GET['goodspage'] == 2) {
         </p>
     </form>
     <?php
-    goodsbiz_list($acc_prefix, 10);
+    goodsbiz_list($acc_prefix, $list_total);
 } // elseif ($_GET['goodspage'] == 2)
 elseif ($_GET['goodspage'] == 'import') {
 
@@ -308,7 +315,7 @@ Form_HTML;
     $results_goodsbiz = $wpdb->get_results("SELECT gb_id, gb_date, gs_name, gn_name, gb_in, gb_out, gb_money, gb_gp_id, gb_summary "
             . " FROM {$acc_prefix}goods_biz, {$acc_prefix}goods_name, {$acc_prefix}goods_series "
             . " WHERE gb_gn_id = gn_id AND gn_gs_id = gs_id "
-            . " ORDER BY gb_id DESC LIMIT 10 ", ARRAY_A);
+            . " ORDER BY gb_id DESC LIMIT {$total} ", ARRAY_A);
 
     foreach ($results_goodsbiz as $gb) {
         $place = id2name("gp_name", "{$acc_prefix}goods_place", $gb['gb_gp_id'], "gp_id");
