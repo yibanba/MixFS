@@ -18,7 +18,7 @@ function acc_query() {
     }
 
     if ($cap == 'manage_options' || $cap == 'mixfs_operator') {
-        add_menu_page('', '明细查询', $cap, 'acc-query-instructions', 'acc_query_instructions');
+        add_menu_page('', '明细查询', $cap, 'acc-query-instructions', 'acc_query_instructions', '', 130);
 
         add_submenu_page('acc-query-instructions', '现金明细汇总', '现金明细汇总', $cap, 'acc-query-instructions', 'acc_query_instructions');
         add_submenu_page('acc-query-instructions', '产成品查询', '产成品查询', $cap, 'goods-qry', 'goods_qry');

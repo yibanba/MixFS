@@ -276,7 +276,7 @@ mixfs_bottom(); // 框架页面底部
  * 显示最近提交业务流水
  * 所有页面显示的最近 10 条业务流水
  */
-function goodsbiz_list($acc_prefix, $total = 10) {
+function goodsbiz_list($acc_prefix, $total = '') {
     global $wpdb;
     echo <<<Form_HTML
         <table class="wp-list-table widefat fixed users" cellspacing="1">
@@ -312,10 +312,11 @@ function goodsbiz_list($acc_prefix, $total = 10) {
 Form_HTML;
 
 // 产成品业务列表
+    $limit = ($total == '') ? "" : " LIMIT {$total}";
     $results_goodsbiz = $wpdb->get_results("SELECT gb_id, gb_date, gs_name, gn_name, gb_in, gb_out, gb_money, gb_gp_id, gb_summary "
             . " FROM {$acc_prefix}goods_biz, {$acc_prefix}goods_name, {$acc_prefix}goods_series "
             . " WHERE gb_gn_id = gn_id AND gn_gs_id = gs_id "
-            . " ORDER BY gb_id DESC LIMIT {$total} ", ARRAY_A);
+            . " ORDER BY gb_id DESC $limit", ARRAY_A);
 
     foreach ($results_goodsbiz as $gb) {
         $place = id2name("gp_name", "{$acc_prefix}goods_place", $gb['gb_gp_id'], "gp_id");

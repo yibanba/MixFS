@@ -20,7 +20,7 @@ function acc_biz() {
     }
 
     if ($cap == 'manage_options' || $cap == 'mixfs_operator') {
-        add_menu_page('', '业务处理', $cap, 'acc-biz-instructions', 'acc_biz_instructions');
+        add_menu_page('', '业务处理', $cap, 'acc-biz-instructions', 'acc_biz_instructions', '', 120);
 
         add_submenu_page('acc-biz-instructions', '业务处理', '业务处理', $cap, 'acc-biz-instructions', 'acc_biz_instructions');
         add_submenu_page('acc-biz-instructions', '产成品业务', '产成品业务', $cap, 'goods-biz', 'goods_biz');

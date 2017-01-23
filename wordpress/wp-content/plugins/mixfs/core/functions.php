@@ -250,7 +250,9 @@ function mixfs_bottom() {
                 $(".alternate").mouseout(function () {
                     $(this).css("background-color", bg);
                 });
-            }
+            };
+            //$(".wp-list-table span").css("text-decoration","underline");
+            //$(".wp-list-table span").css("font-weight","bold");
         });
     </script>
 

@@ -17,7 +17,7 @@ function mixfs_admin_menus() {
     }
 
     if ($cap == 'manage_options') {
-        add_menu_page('', '米克斯财会软件', $cap, 'mixfs-instructions', 'instructions');
+        add_menu_page('', '米克斯财会软件', $cap, 'mixfs-instructions', 'instructions', '', 110);
     
         add_submenu_page('mixfs-instructions', '使用说明', 'MixFS 使用说明', $cap, 'mixfs-instructions', 'instructions');
         add_submenu_page('mixfs-instructions', '财务软件入口', '财务软件入口', $cap, 'mixfs-entrance', 'entrance');
@@ -126,7 +126,7 @@ function remove_menu() {
 add_action('admin_init','remove_menu');
 
 function admin_footer_left_text($text) {
-	$text = '<span id="footer-thankyou">米克斯财务软件 <a href="http://www.mixfs.com/">www.mixfs.com</a></span>'; 
+	$text = '<span id="footer-thankyou">米克斯财会软件 <a href="http://www.mixfs.com/">www.mixfs.com</a></span>'; 
 	return $text;
 }
 add_filter('admin_footer_text', 'admin_footer_left_text'); 
