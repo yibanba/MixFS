@@ -41,7 +41,9 @@ if (isset($_GET['gn_id'])) { // 指定产品的业务明细
         </div>
         <br />';
     sales($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2'], '', $_GET['gp_id']);
-    //biz_of_place($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2'], $_GET['gn_id']);
+    
+    // qry_total() 2个功能，全部仓库和指定仓库的产品列表，前期、当期库存和销售
+    qry_total($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2'], $_GET['gp_id']);
     
 } elseif (isset($_POST['btn_qry_detail'])) { // 全部产品明细查询
     
@@ -186,11 +188,13 @@ function qry_detail($acc_prefix) {
 
 
 /**
- * 汇总库存和销售
+ * 全部仓库 —— 汇总库存和销售
+ * 指定仓库 —— 汇总库存和销售 $gp_id
  */
 function qry_total($acc_prefix, $startday, $endday, $gp_id=0) {
     global $wpdb;
     
+    $where = ($gp_id == 0) ? "" : " AND gb_gp_id={$gp_id} ";
     $sql = "SELECT gn_id, gs_name, gn_name, gn_price,
                 SUM( if(gb_date < '{$startday}', gb_in, 0) ),
                 SUM( if(gb_date < '{$startday}' , gb_out, 0) ),
@@ -199,7 +203,7 @@ function qry_total($acc_prefix, $startday, $endday, $gp_id=0) {
                 SUM( if(gb_date >= '{$startday}' && gb_date <= '{$endday}' && gb_money <> 0, gb_out, 0) ),
                 SUM( if(gb_date >= '{$startday}' && gb_date <= '{$endday}', gb_money, 0) )
             FROM {$acc_prefix}goods_biz, {$acc_prefix}goods_name, {$acc_prefix}goods_series
-            WHERE gb_gn_id = gn_id AND gn_gs_id = gs_id
+            WHERE gb_gn_id = gn_id AND gn_gs_id = gs_id {$where}
             GROUP BY gn_id
             ORDER BY gn_gs_id, gn_name";
     $inventory = $wpdb->get_results($sql, ARRAY_N); // 全部仓库
@@ -248,10 +252,10 @@ Form_HTML;
             . "<td class='name'>{$fields[0]}</td>"
             . "<td class='name'>{$fields[1]}</td>"
             . "<td class='name'><span {$url}>{$fields[2]}</span></td>"
-            . "<td class='name'>" . ($fields[4] - $fields[5]) . "</td>"
-            . "<td class='name'>" . ($fields[6] -$fields[7] + $fields[8] - $fields[4] + $fields[5]) . "</td>"
-            . "<td class='name'>{$fields[8]}</td>"
-            . "<td class='name'>" . ($fields[6] -$fields[7]) . "</td>"
+            . "<td class='name'>" . mix_num($fields[4] - $fields[5]) . "</td>"
+            . "<td class='name'>" . mix_num($fields[6] -$fields[7] + $fields[8] - $fields[4] + $fields[5]) . "</td>"
+            . "<td class='name'>" . mix_num($fields[8]) . "</td>"
+            . "<td class='name'>" . mix_num($fields[6] -$fields[7]) . "</td>"
             . "<td class='name'>{$fields[9]}</td>"
             . "<td class='name'>{$fields[3]}</td>"
             . "<td class='name'>" . ($fields[3] * ($fields[6] - $fields[7])) . "</td>";
@@ -277,77 +281,7 @@ Form_HTML;
     echo '</table><br />';
 } // function qry_total($acc_prefix)
 
-function qg_all_place($dis_btn = 1) {
 
-        $r = run_sql("SELECT gn_id, gs_name, gn_name,
-                                    SUM( if(gb_date < '{$_SESSION["startdate"]}', gb_in, 0) ),
-                                    SUM( if(gb_date < '{$_SESSION["startdate"]}' , gb_out, 0) ),
-                                    SUM( if(gb_date <= '{$_SESSION["enddate"]}', gb_in, 0) ),
-                                    SUM( if(gb_date <= '{$_SESSION["enddate"]}' , gb_out, 0) ),
-		        SUM( if(gb_date >= '{$_SESSION["startdate"]}' && gb_date <= '{$_SESSION["enddate"]}' && gb_money <> 0, gb_out, 0) ),
-                                    SUM( if(gb_date >= '{$_SESSION["startdate"]}' && gb_date <= '{$_SESSION["enddate"]}', gb_money, 0) ),
-		        gn_price
-                                FROM {$_SESSION["submod"]}_goods_biz, {$_SESSION["submod"]}_goods_name, {$_SESSION["submod"]}_goods_series
-		    WHERE gb_gn_id = gn_id AND gn_gs_id = gs_id
-                                GROUP BY gn_id
-                                ORDER BY gn_gs_id, gn_name"
-                        , "查询 所有仓库、指定期间 的出入库及总库存情况");
-
-        if(mysql_num_rows($r) > 0) {
-            echo "<table id='report'>
-                                <caption>下表中的 库存统计 是： {$_SESSION["startdate"]} —— {$_SESSION["enddate"]} 的数据，(含所有赊销且未结账的产成品数)；销售单价随最近销售动态调整</caption>
-		    <tr><th>代码</th><th>系列</th><th>品名</th>
-                                        <th>前期库存</th><th>本期入库</th><th>本期出库</th><th>当前库存</th>
-                                        <th>本期销售金额</th><th>最近售价</th><th>预计库存销售额</th>
-                                </tr>";
-
-            $stock = 0;
-            $cash = 0;
-            $counter = 0;
-            $head = "<tr><th>代码</th><th>系列</th><th>品名</th>
-                                            <th>前期库存</th><th>本期入库</th><th>本期出库</th><th>当前库存</th>
-                                            <th>本期销售金额</th><th>最近售价</th><th>预计库存销售额</th>
-                                    </tr>"; // 用于重复20行打印表头
-
-            while($row = mysql_fetch_row($r)) {
-
-                $stock += ($row[5] - $row[6]);
-                $cash += ($row[9] * ($row[5] - $row[6]));
-		echo "<tr><td>$row[0]</td><td>$row[1]</td><td>";
-
-                if($dis_btn) {
-                    echo "<input type='button' name='return_btn'  id='return_btn' style='height: 22px; margin: 0; padding: 0 25px; width: 110px; '
-		onClick=\"javascript:location.href='{$_SERVER['PHP_SELF']}?gnid={$row[0]}'\" value='{$row[2]}' />";
-                } else {
-                    echo "[ $row[2] ]";
-                }
-
-                echo "</td>
-                            <td>" . my_num( $row[3] - $row[4] ) . "</td>
-                            <td>" . my_num( $row[5] -$row[6] + $row[7] - $row[3] + $row[4]) . "</td>
-                            <td>" . my_num( (int)$row[7] ) . "</td>
-                            <td>" . my_num(  $row[5] -$row[6] ) . "</td>
-                            <td>" . my_num($row[8]) . "</td>
-                            <td>" . my_num($row[9]) . "</td>
-                            <td>" . my_num($row[9] * ($row[5] - $row[6])) . "</td>
-                          </tr>";
-
-                if((++$counter) % 33 == 0) {
-                    echo $head;
-                }
-
-            }
-            echo '</table>';
-            echo "<br /><table id='report'><tr>
-                                    <th>所有仓库当前库存合计( 双 )：</th><th>" . my_num($stock) . "</th>
-                                    <th>预计库存销售额合计：</th><th>" . my_num($cash) . "</th>
-                                    </tr></table>";
-
-        } else {
-	    page_msg("本表中没有数据");
-	}
-    }
-    
 /**
  * 默认查询表单
  */

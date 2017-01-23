@@ -196,9 +196,17 @@ jQuery(document).ready(function($) {
 });
 </script>
 autoJS;
-}
+} // autocompletejs
 
-// autocompletejs
+/**
+ * 自定义数字格式化
+ */
+function mix_num($old_num, $cash=FALSE) {
+    if($cash) {
+        return number_format($old_num, 2);
+    }
+    return ($old_num == 0) ? '' : $old_num;
+}
 
 /**
  * 所有页面输出的框架
