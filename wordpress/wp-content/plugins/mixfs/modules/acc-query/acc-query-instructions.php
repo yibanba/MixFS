@@ -106,8 +106,8 @@ function cash_total($acc_prefix, $startday, $endday) {
                     <th class='manage-column'  style="">子项目</th>
                     <th class='manage-column' style="">现金增减</th>
                     <th class='manage-column' style="">前期余额</th>
-                    <th class='manage-column' style="">现金增加</th>
-                    <th class='manage-column'  style="">现金减少</th>
+                    <th class='manage-column' style="">本期现金增加</th>
+                    <th class='manage-column'  style="">本期现金减少</th>
                     <th class='manage-column'  style="">本期余额</th>
                     <th class='manage-column'  style="">项目说明</th>
                 </tr>
@@ -119,38 +119,46 @@ function cash_total($acc_prefix, $startday, $endday) {
                     <th class='manage-column'  style="">子项目</th>
                     <th class='manage-column' style="">现金增减</th>
                     <th class='manage-column' style="">前期余额</th>
-                    <th class='manage-column' style="">现金增加</th>
-                    <th class='manage-column'  style="">现金减少</th>
+                    <th class='manage-column' style="">本期现金增加</th>
+                    <th class='manage-column'  style="">本期现金减少</th>
                     <th class='manage-column'  style="">本期余额</th>
                     <th class='manage-column'  style="">项目说明</th>
                 </tr>
             </tfoot>
             <tbody>
 Form_HTML;
-
+    
     echo "<tr class='alternate'>
                     <td class='name'>1</td>
                     <td class='name' colspan='2'>产成品销售</td>
-                    <td class='name'>十</td>
+                    <td class='name'>+</td>
                     <td class='name'>" . mix_num($goods_prior, 2) . "</td>
-                    <td class='name'>" . mix_num(($goods_current - $goods_prior - $goods_return), 2) . "</td>
-                    <td class='name'>" . mix_num(-1.00 * $goods_return, 2) . "</td>
+                    <td class='name'>" . mix_num(($goods_current - $goods_prior + (-$goods_return)), 2) . "</td>
+                    <td class='name'>" . mix_num(-1 * $goods_return, 2) . "</td>
                     <td class='name'>" . mix_num($goods_current, 2) . "</td>
                     <td class='name'>现金减少为销售退回</td>
                 </tr>";
     echo "<tr class='alternate'>
                     <td class='name'>2</td>
                     <td class='name' colspan='2'>原材料销售</td>
-                    <td class='name'>十</td>
+                    <td class='name'>+</td>
                     <td class='name'>" . mix_num($stuff_prior, 2) . "</td>
-                    <td class='name'>" . mix_num(($stuff_current - $stuff_prior - $stuff_return), 2) . "</td>
-                    <td class='name'>" . mix_num(-1.00 * $stuff_return , 2) . "</td>
+                    <td class='name'>" . mix_num(($stuff_current - $stuff_prior + (-$stuff_return)), 2) . "</td>
+                    <td class='name'>" . mix_num(-1 * $stuff_return , 2) . "</td>
                     <td class='name'>" . mix_num($stuff_current, 2) . "</td>
                     <td class='name'>现金减少为销售退回</td>
                 </tr>";
 
-    $counter = 2; // 产品和原材料占用 2 行
-    $fee_current = 0;
+    /**
+     * 产成品 和 原材料
+     * $pre_balance = 前期余额，$cur_breakeven = 当期盈亏
+     */
+    $pre_balance = $goods_prior + $stuff_prior;
+    $cur_breakeven = ($goods_current - $goods_prior)
+                    + ($stuff_current - $stuff_prior);
+    
+    $counter = 2;           // 产品和原材料占用 2 行
+
     if (count($r_fee) > 0) {
         $pre_fee = 0;
         foreach ($r_fee as $fields) {
@@ -169,7 +177,7 @@ Form_HTML;
             }
 
             // fb_in, fb_out不应该同时有金额，所以相加$fields[4] + $fields[5]求前期余额
-            echo ($fields[5] == 1) ? "<td class='name'>十</td>" : "<td class='name'> &nbsp; —</td>";
+            echo ($fields[5] == 1) ? "<td class='name'>+</td>" : "<td class='name'>-</td>";
             
             // 差 2 个字段
 
@@ -177,34 +185,38 @@ Form_HTML;
                    <td class='name'>" . mix_num($fields[8], 2) . "</td>
                    <td class='name'>" . mix_num($fields[9], 2) . "</td>
                    <td class='name'>" . mix_num(abs($fields[6] - $fields[7] + $fields[8] - $fields[9]), 2) . "</td>
-                   <td class='name'>{$fields[10]}</td></tr>";
+                   <td class='name'>{$fields[4]}</td></tr>";
 
-            $fee_current += ($fields[4] - $fields[5] + $fields[6] - $fields[7]);
+            $pre_balance += ($fields[6] - $fields[7]);
+            $cur_breakeven += ($fields[8] - $fields[9]); // 费用类增加现金合计
         }
         echo "</tbody></table>";
     }
-
-
-    $sales_total = mix_num($goods_current + $stuff_current, 2);
-    $fee_total = mix_num(abs($fee_current), 2);
-    $balance = mix_num($goods_current + $stuff_current + $fee_current, 2);
+    
+    $pre = mix_num($pre_balance, 2);
+    $cur = mix_num($cur_breakeven, 2);
+    $balance = mix_num($pre_balance + $cur_breakeven, 2);
     
     echo <<<Form_HTML
         <br />
     <table class="wp-list-table widefat fixed users" cellspacing="1">
     <thead>
         <tr>
-            <th class='manage-column' style="width:150px;">销售收入总额: </th>
-            <th class='manage-column' style="">{$sales_total}</th>
-            <th class='manage-column'  style="width:150px;">本期现金减少总额: </th>
-            <th class='manage-column'  style="">{$fee_total}</th>
-            <th class='manage-column'  style="width:150px;">本期现金收支净额($): </th>
-            <th class='manage-column'  style="">{$balance}</th>
+            <th class='manage-column' style="" colspan='2'>前期现金余额: </th>
+            <th class='manage-column' style="" colspan='2'>本期盈亏: </th>
+            <th class='manage-column' style="" colspan='2'>本期现金余额($): </th>
+        </tr>
+        <tr class='alternate'>
+            <th class='manage-column'>{$pre}</th>
+            <th class='manage-column'>✚</th>
+            <th class='manage-column'>{$cur}</th>
+            <th class='manage-column'> 〓 </th>
+            <th class='manage-column'>{$balance}</th>
+            <th class='manage-column'> </th>
         </tr>
     </thead>
 Form_HTML;
             
     echo '</table><br />';
-    echo "<div id='message' class='updated'><p>汇总表公式： ( 产品销售 + 原料销售 + 赊销返款 ) — ( 投资总额 + 周转借款 - 费用总额 ) = 当前现金余额</p></div>";
 
 } // function cash_total

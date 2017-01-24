@@ -19,13 +19,13 @@ function mixfs_admin_menus() {
     if ($cap == 'manage_options') {
         add_menu_page('', '米克斯财会软件', $cap, 'mixfs-instructions', 'instructions', '', 110);
     
-        add_submenu_page('mixfs-instructions', '使用说明', 'MixFS 使用说明', $cap, 'mixfs-instructions', 'instructions');
+        add_submenu_page('mixfs-instructions', '进销存概况', '进销存概况', $cap, 'mixfs-instructions', 'instructions');
         add_submenu_page('mixfs-instructions', '财务软件入口', '财务软件入口', $cap, 'mixfs-entrance', 'entrance');
         add_submenu_page('mixfs-instructions', '账套列表', '账套列表', $cap, 'accounting-list', 'accounting_list');
         add_submenu_page('mixfs-instructions', '权限分配', '权限分配', $cap, 'accounting-permission', 'accounting_permission');
     } elseif ($cap == 'mixfs_operator') {
         add_menu_page('', '米克斯财会软件', $cap, 'mixfs-instructions', 'instructions');
-        add_submenu_page('mixfs-instructions', '使用说明', 'MixFS 使用说明', $cap, 'mixfs-instructions', 'instructions');
+        add_submenu_page('mixfs-instructions', '进销存概况', '进销存概况', $cap, 'mixfs-instructions', 'instructions');
         add_submenu_page('mixfs-instructions', '财务软件入口', '财务软件入口', $cap, 'mixfs-entrance', 'entrance');
     }
     
@@ -98,23 +98,24 @@ add_action( 'wp_before_admin_bar_render', 'remove_admin_bar' );
 
 function added_admin_bar() {
 	global $wp_admin_bar;
-
-	//Add a link called 'My Link'...
 	$wp_admin_bar->add_menu( array(
-		'id'    => 'my_link',
-		'title' => '我的菜单',
-		'href'  => admin_url()
+		'id'    => 'empty',
+		'title' => ' ',
+		'href'  => ''
 	));
-
-	//THEN add a sub-link called 'Sublink 1'...
+        $wp_admin_bar->add_menu( array(
+		'id'    => 'validity',
+		'title' => '服务器及数据库租用有效期',
+		'href'  => ''
+	));
 	$wp_admin_bar->add_menu( array(
-		'id'    => 'sub_link1',
-		'title' => '子菜单1',
-		'href'  => admin_url('profile.php'),
-		'parent'=>'my_link'
+		'id'    => 'date',
+		'title' => ' ( 2017-3-15 —— 2019-3-15 ) ',
+		'href'  => '',
+		'parent'=>'validity'
 	));
 }
-//add_action( 'wp_before_admin_bar_render', 'added_admin_bar' ); 
+add_action( 'wp_before_admin_bar_render', 'added_admin_bar' ); 
 
 function remove_menu() {
     global $current_user;
