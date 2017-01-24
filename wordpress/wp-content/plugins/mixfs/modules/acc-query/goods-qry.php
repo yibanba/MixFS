@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
-mixfs_top('产成品业务', $_SESSION['acc_name']);
+mixfs_top('产成品明细查询', $_SESSION['acc_name']);
 
 global $wpdb;
 $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
@@ -42,28 +42,28 @@ if (isset($_GET['gn_id'])) { // 指定产品的业务明细
         <br />';
     sales($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2'], '', $_GET['gp_id']);
     
-    // qry_total() 2个功能，全部仓库和指定仓库的产品列表，前期、当期库存和销售
-    qry_total($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2'], $_GET['gp_id']);
+    // qry_goods_total() 2个功能，全部仓库和指定仓库的产品列表，前期、当期库存和销售
+    qry_goods_total($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2'], $_GET['gp_id']);
     
 } elseif (isset($_POST['btn_qry_detail'])) { // 全部产品明细查询
     
     $_SESSION['qry_date']['date1'] = $_POST['qry_date1'];
     $_SESSION['qry_date']['date2'] = $_POST['qry_date2'];
-    form_qry();
-    qry_detail($acc_prefix);
+    form_qry_goods();
+    qry_goods_detail($acc_prefix);
     
 } elseif (isset($_POST['btn_qry_total'])) { // 汇总产品、销售查询
     
     $_SESSION['qry_date']['date1'] = $_POST['qry_date1'];
     $_SESSION['qry_date']['date2'] = $_POST['qry_date2'];
-    form_qry();
+    form_qry_goods();
     echo '<div id="message" class="updated"><p>点击"产品"名称查询明细</p></div>';
 
     sales($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2']);
-    qry_total($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2']);
+    qry_goods_total($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2']);
 } else {
     
-    form_qry();
+    form_qry_goods();
     
 }
 
@@ -135,7 +135,7 @@ Form_HTML;
  * 查询指定日期每个仓库库存
  * @global type $wpdb
  */
-function qry_detail($acc_prefix) {
+function qry_goods_detail($acc_prefix) {
     echo '<div id="message" class="updated"><p>点击"产品"和"仓库"名称查询明细</p></div>';
     global $wpdb;
     $places = $wpdb->get_results("SELECT gp_id, gp_name FROM {$acc_prefix}goods_place", ARRAY_A); // 全部仓库
@@ -184,14 +184,14 @@ function qry_detail($acc_prefix) {
     . $tbl
     . '</tbody></table>';
     
-} // function qry_detail
+} // function qry_goods_detail
 
 
 /**
  * 全部仓库 —— 汇总库存和销售
  * 指定仓库 —— 汇总库存和销售 $gp_id
  */
-function qry_total($acc_prefix, $startday, $endday, $gp_id=0) {
+function qry_goods_total($acc_prefix, $startday, $endday, $gp_id=0) {
     global $wpdb;
     
     $where = ($gp_id == 0) ? "" : " AND gb_gp_id={$gp_id} ";
@@ -279,13 +279,13 @@ Form_HTML;
 Form_HTML;
     }
     echo '</table><br />';
-} // function qry_total($acc_prefix)
+} // function qry_goods_total($acc_prefix)
 
 
 /**
  * 默认查询表单
  */
-function form_qry() {
+function form_qry_goods() {
     ?>
     <form action="" method="post">
         <div class="manage-menus">
@@ -309,7 +309,7 @@ function form_qry() {
         <br />
     </form>
     <?php
-} // function form_qry()
+} // function form_qry_goods()
 
 function sales($acc_prefix, $startday, $endday, $gn_id=0, $gp_id=0) {
     global $wpdb;

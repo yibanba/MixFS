@@ -51,6 +51,18 @@ function accounting_permission() {
 //******************************************************************************
 
 /**
+ * 登录后默认跳转至 财务入口页
+ */
+function mix_login_redirect($redirect_to, $request){
+    if( empty( $redirect_to ) || $redirect_to == 'wp-admin/' || $redirect_to == admin_url() ) {
+        return admin_url("admin.php?page=mixfs-entrance");
+    } else {
+        return $redirect_to;
+    }
+}
+add_filter("login_redirect", "mix_login_redirect", 10, 3);
+
+/**
  * 去除升级提示
  */
 function wp_hide_nag() {
