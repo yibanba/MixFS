@@ -5,8 +5,14 @@ if (!defined('ABSPATH'))
 mixfs_top('资金往来业务', $_SESSION['acc_name']);
 
 global $wpdb;
-
 $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
+
+$list_total = 15;
+
+
+if( ! isset($_SESSION['rate'])) { // 设置当地货币转美元的汇率
+    $_SESSION['rate'] = 1.000;
+}
 
 if (isset($_POST['feebiz_submit'])) {
 
@@ -20,9 +26,12 @@ if (isset($_POST['feebiz_submit'])) {
     $fi_fields = $wpdb->get_row("SELECT fi_id, fi_in_out FROM {$acc_prefix}fee_item WHERE fi_name = '{$_POST['feebiz_item']}'", ARRAY_A);
     $fee_item_id = $fi_fields['fi_id'];    
     $in_out = ($fi_fields['fi_in_out'] == '1') ? 'fb_in' : 'fb_out';
+    
+    $_SESSION['rate'] = trim($_POST['feebiz_rate']);
+    $money = trim($_POST['feebiz_money']);
     if ($fee_item_id && is_numeric(trim($_POST['feebiz_money'])) && $_SESSION['feebiz']['date']) {
         $wpdb->insert($acc_prefix . 'fee_biz', array('fb_date' => $_SESSION['feebiz']['date'],
-            $in_out => trim($_POST['feebiz_money']),
+            $in_out => ($money / $_SESSION['rate']),
             'fb_c_id' => $_POST['feebiz_container'],
             'fb_summary' => trim($_POST['feebiz_sum']),
             'fb_fi_id' => $fee_item_id
@@ -65,7 +74,11 @@ date_from_to("feebiz_date");
             ?>
             <tr class="form-field">
                 <th scope="row"><label for="feebiz_money">金额 (必填数字)</label></th>
-                <td><input name="feebiz_money" type="text" id="feebiz_money" value=""></td>
+                <td>
+                    <input name="feebiz_money" type="text" id="feebiz_money" value="">
+                    <input name="feebiz_rate" type="text" id="feebiz_rate" value="<?php echo $_SESSION['rate']; ?>" maxlength="6" tabindex="9" style="width: 4em;">
+                            <label for="feebiz_rate">美元汇率
+                </td>
             </tr>
             <tr class="form-field">
                 <th scope="row"><label for="feebiz_container">货柜号</label></th>
@@ -132,7 +145,7 @@ Form_HTML;
 
 $results_feebiz = $wpdb->get_results("SELECT fb_id, fb_date, fs_name, fi_name, fb_in, fb_out, fb_c_id, fb_summary "
         . " FROM {$acc_prefix}fee_biz, {$acc_prefix}fee_item, {$acc_prefix}fee_series "
-        . " WHERE fi_fs_id = fs_id AND fb_fi_id = fi_id ORDER BY fb_id DESC LIMIT 10 ", ARRAY_A);
+        . " WHERE fi_fs_id = fs_id AND fb_fi_id = fi_id ORDER BY fb_id DESC LIMIT {$list_total} ", ARRAY_A);
 
 foreach ($results_feebiz as $fb) {
     $container = id2name("c_no", "{$acc_prefix}container", $fb['fb_c_id'], "c_id");

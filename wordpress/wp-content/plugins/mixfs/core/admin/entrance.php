@@ -6,6 +6,8 @@ mixfs_top('财务软件入口');
 
 unset($_SESSION['acc_tbl']);
 unset($_SESSION['acc_name']);
+unset($_SESSION['login_log']);
+
 
 /**
  * 1. update: md5()

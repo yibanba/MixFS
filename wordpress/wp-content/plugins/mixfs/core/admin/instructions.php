@@ -1,6 +1,5 @@
 <?php
-if (!defined('ABSPATH'))
-    exit; // Exit if accessed directly
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 
 /**
@@ -17,9 +16,20 @@ if (!empty($_SESSION['mas'][$_GET['mas']])) {
     exit();
 }
 
-global $wpdb;
-
+global $wpdb, $current_user;
 $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
+
+// 统计访问账套的：人员、时间、IP
+if( ! isset($_SESSION['login_log']) ) {
+    $wpdb->insert( $wpdb->prefix . "mixfs_user_log", 
+            array( 'uid' => $current_user->ID,
+                   'ip' => $_SERVER['REMOTE_ADDR'],
+                   'account' => $_SESSION['acc_name']
+                ), array( '%s', '%s', '%s' )
+            );
+    $_SESSION['login_log'] = TRUE;
+}
+
 $limit = 20; //排行榜显示数量
 if($_POST['btn_jxc']) {
     $_SESSION['overview']['startdate'] = $_POST['overview_date1'];

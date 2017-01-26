@@ -199,11 +199,63 @@ autoJS;
 } // autocompletejs
 
 /**
+ * 产成品专用自动补全
+ * 双击显示全部
+ * 自动填充 每件双数 input
+ */
+function goodscompletejs($cols_format, $tag) {
+    echo <<<autoJS
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+
+    $.widget( "custom.catcomplete", $.ui.autocomplete, {
+        _create: function() {
+            this._super();
+            this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
+        },
+        _renderMenu: function( ul, items ) {
+            var that = this,
+            currentCategory = "";
+            $.each( items, function( index, item ) {
+                var li;
+                if ( item.category != currentCategory ) {
+                    ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+                    currentCategory = item.category;
+                }
+                li = that._renderItemData( ul, item );
+                if ( item.category ) {
+                li.attr( "aria-label", item.category + " : " + item.label );
+                }
+            });
+        }
+    });
+
+    $( "#{$tag}" ).catcomplete({
+        delay: 0,
+        source: [$cols_format],
+        select: function( event, ui ) {
+            $("#per_pack").val(ui.item.per_pack);
+	}
+    });
+    $( "#{$tag}" ).catcomplete({
+        minLength: 0
+    }).dblclick(function () {
+        $(this).catcomplete('search', '');
+    });
+    $( "#{$tag}" ).focus(function(){  
+     $(this).val("");
+    });
+});
+</script>
+autoJS;
+} // autocompletejs
+
+/**
  * 自定义数字格式化
  */
-function mix_num($old_num, $cash=FALSE) {
+function mix_num($old_num, $cash=FALSE, $placeholder='') {
     if($cash) {
-        return number_format($old_num, 2);
+        return ($old_num != 0) ? number_format($old_num, 2) : $placeholder;
     }
     return ($old_num == 0) ? '' : $old_num;
 }
@@ -249,7 +301,7 @@ function mixfs_bottom() {
         jQuery(document).ready(function ($) {
             if ($(".alternate").length > 0) {
                 var bg = '';
-                $(".alternate:odd").css("background-color", "#F7F7F7");
+                $(".alternate:odd").css("background-color", "#FAFAFA");
 
                 $(".alternate").mouseover(function () {
                     bg = $(this).css("background-color");

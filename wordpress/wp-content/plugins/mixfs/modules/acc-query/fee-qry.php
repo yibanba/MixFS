@@ -248,8 +248,8 @@ Form_HTML;
         } // foreach
         echo '</tbody></table>';
 
-        $curent_in = mix_num($curent_in, TRUE);
-        $curent_out = mix_num($curent_out, TRUE);
+        $cur_in = mix_num($curent_in, TRUE);
+        $cur_out = mix_num($curent_out, TRUE);
         $balance = mix_num(($curent_in - $curent_out), TRUE);
         echo <<<Form_HTML
         <br />
@@ -257,9 +257,9 @@ Form_HTML;
     <thead>
         <tr>
             <th class='manage-column' style="width:150px;">本期现金增加总额: </th>
-            <th class='manage-column' style="">{$curent_in}</th>
+            <th class='manage-column' style="">{$cur_in}</th>
             <th class='manage-column'  style="width:150px;">本期现金减少总额: </th>
-            <th class='manage-column'  style="">{$curent_out}</th>
+            <th class='manage-column'  style="">{$cur_out}</th>
             <th class='manage-column'  style="width:150px;">本期现金收支净额($): </th>
             <th class='manage-column'  style="">{$balance}</th>
         </tr>

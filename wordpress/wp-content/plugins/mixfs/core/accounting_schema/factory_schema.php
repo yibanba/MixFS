@@ -103,6 +103,7 @@ function create_factory_tables($tbl_prefix) {
             `gn_name` varchar(30) NOT NULL,
             `gn_price` decimal(12,2) DEFAULT '0.00',
             `gn_summary` varchar(100) DEFAULT NULL,
+            `gn_per_pack` int(11) NOT NULL DEFAULT '1',
             PRIMARY KEY (`gn_id`),
             KEY `gn_name` (`gn_name`),
             KEY `gn_gs_id` (`gn_gs_id`)

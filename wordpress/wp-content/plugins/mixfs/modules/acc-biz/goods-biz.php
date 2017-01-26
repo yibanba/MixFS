@@ -9,6 +9,10 @@ global $wpdb;
 $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
 $list_total = 15;
 
+if( ! isset($_SESSION['rate'])) { // 设置当地货币转美元的汇率
+    $_SESSION['rate'] = 1.000;
+}
+
 if (isset($_POST['goodsbiz_1'])) {
 
     $_SESSION['goodsbiz']['date'] = '';
@@ -47,7 +51,7 @@ if (isset($_POST['goodsbiz_1'])) {
 } // if (isset($_POST['goodsbiz_1']))
 elseif (isset($_POST['goodsbiz_submit'])) {
     $goods_name = $wpdb->get_var("SELECT gn_id FROM {$acc_prefix}goods_name WHERE gn_name = '{$_POST['goodsbiz_name']}'");
-    $goods_num = is_numeric($_POST['goodsbiz_num']) ? $_POST['goodsbiz_num'] : 0;
+    $goods_num = is_numeric($_POST['goodsbiz_num']) ? $_POST['goodsbiz_num']*$_POST['per_pack'] : 0;
 
     if ($_SESSION['goodsbiz']['inout'] == '入库') {
         if ($goods_name && $goods_num) {
@@ -64,18 +68,19 @@ elseif (isset($_POST['goodsbiz_submit'])) {
         }
     } elseif ($_SESSION['goodsbiz']['inout'] == '销售或退回') {
         $money = trim($_POST['goodsbiz_money']);
-        if ($goods_name && $goods_num && is_numeric($money)) {
+        $_SESSION['rate'] = trim($_POST['goodsbiz_rate']);
+        if ($goods_name && ($goods_num * $money > 0) && $_SESSION['rate']) {
             $wpdb->insert($acc_prefix . 'goods_biz', array('gb_date' => $_SESSION['goodsbiz']['date'],
                 'gb_gp_id' => $_SESSION['goodsbiz']['out'],
                 'gb_out' => $goods_num,
-                'gb_money' => $money,
+                'gb_money' => ($money / $_SESSION['rate']),
                 'gb_summary' => trim($_POST['goodsbiz_sum']),
                 'gb_gn_id' => $goods_name
                     )
             );
-            if($money > 0) {
+            if($money > 0) { // 正常销售，不含退货
                 $wpdb->update( $acc_prefix . 'goods_name', 
-                    array( 'gn_price' => number_format(($money/$goods_num),2) ), 
+                    array( 'gn_price' => number_format(($money/$goods_num) / $_SESSION['rate'],2) ), 
                     array( 'gn_id' => $goods_name ), 
                     array( '%.2f' ), array( '%d' ) );
             }
@@ -105,7 +110,19 @@ elseif (isset($_POST['goodsbiz_submit'])) {
         }
     }
 } // elseif (isset($_POST['goodsbiz_submit']))
-
+elseif (isset ($_POST['update_per_pack'])) {
+    if( $_POST['goodsbiz_name'] && $_POST['per_pack']) {
+        $updated = $wpdb->update( "{$acc_prefix}goods_name", 
+                array('gn_per_pack'=> $_POST['per_pack']), 
+                array('gn_name'=>$_POST['goodsbiz_name']),
+                array( '%d' ));
+        if($updated == 0) {
+            echo "<div id='message' class='updated'><p>选择产品名称后再提交</p></div>";
+        } else {
+            echo "<div id='message' class='updated'><p>更新【{$_POST['goodsbiz_name']}】产品件双数成功</p></div>";            
+        }
+    }
+}
 
 if (!isset($_GET['goodspage'])) {
     date_from_to("goodsbiz_date");
@@ -219,43 +236,53 @@ elseif ($_GET['goodspage'] == 2) {
     ?>
                 <tr class="form-field">
                     <th scope="row"><label for="goodsbiz_name">产成品名称 (必填)</label></th>
-                    <td><input type="text" name="goodsbiz_name" id="goodsbiz_name" value="双击选择或输入关键字"></td>
+                    <td><input type="text" name="goodsbiz_name" id="goodsbiz_name" value="双击选择或输入关键字" tabindex="2"></td>
                 </tr>
     <?php
     // 自动完成文本框，选择产成品名称
-    $get_cols = $wpdb->get_results("SELECT gs_name, gn_name, gn_id FROM {$acc_prefix}goods_name, {$acc_prefix}goods_series "
+    $get_cols = $wpdb->get_results("SELECT gs_name, gn_name, gn_id, gn_per_pack FROM {$acc_prefix}goods_name, {$acc_prefix}goods_series "
             . " WHERE gn_gs_id=gs_id ORDER BY gn_gs_id, gn_name", ARRAY_A);
 
     $cols_str = '';
     foreach ($get_cols as $value) {
-        $cols_str .= '{ label: "' . $value['gn_name'] . '", category: "' . $value['gs_name'] . ' 系列"},';
+        $cols_str .= '{ label: "' . $value['gn_name'] . '", category: "' . $value['gs_name'] . ' 系列", per_pack:"' . $value['gn_per_pack'] . '"},';
     }
     $cols_format = rtrim($cols_str, ',');
 
-    autocompletejs($cols_format, 'goodsbiz_name');
+    goodscompletejs($cols_format, 'goodsbiz_name');
     ?>
                 <tr class="form-field">
                     <th scope="row"><label for="goodsbiz_num">数量 (必填<?php echo $returns; ?>)</label></th>
-                    <td><input name="goodsbiz_num" type="text" id="goodsbiz_num" value=""></td>
+                    <td>
+                        <input name="goodsbiz_num" type="text" id="goodsbiz_num" value="" tabindex="3"> ×
+                        <input name="per_pack" type="text" id="per_pack" value="1" tabindex="7" style="width: 4em;">
+                        <label for="per_pack">双/每件</label>
+                    </td>
                 </tr>
     <?php if ($_SESSION['goodsbiz']['inout'] == '销售或退回') { ?>
                     <tr class="form-field">
                         <th scope="row"><label for="goodsbiz_money">金额 (必填<?php echo $returns; ?>)</label></th>
-                        <td><input name="goodsbiz_money" type="text" id="goodsbiz_money" value=""></td>
+                        <td>
+                            <input name="goodsbiz_money" type="text" id="goodsbiz_money" value="" tabindex="4"> ÷
+                            <input name="goodsbiz_rate" type="text" id="goodsbiz_rate" value="<?php echo $_SESSION['rate']; ?>" maxlength="6" tabindex="9" style="width: 4em;">
+                            <label for="goodsbiz_rate">美元汇率
+                        </td>
                     </tr>
     <?php } ?>
                 <tr class="form-field">
                     <th scope="row"><label for="goodsbiz_sum">业务摘要</label></th>
-                    <td><input name="goodsbiz_sum" type="text" id="goodsbiz_sum" value=""></td>
+                    <td><input name="goodsbiz_sum" type="text" id="goodsbiz_sum" value="" tabindex="5"></td>
                 </tr>
             </tbody>
         </table>
 
         <p class="submit">
-            <input type="submit" name="goodsbiz_submit" id="goodsbiz_submit" class="button button-primary" value="提交业务" />
+            <input type="submit" name="goodsbiz_submit" id="goodsbiz_submit" class="button button-primary" value="提交业务" tabindex="6" />
             <input type="reset" name="goodsbiz_r" id="goodsbiz_r" class="button button-primary" value="清空内容" />
             <input type="button" name="goodsbiz_return" id="goodsbiz_return" class="button button-primary" value="返回上级" 
                    onclick="location.href = location.href.substring(0, location.href.indexOf('&goods'))" />
+            <input type="submit" name="update_per_pack" id="update_per_pack" class="button" value="每件双数更新" tabindex="8" />
+
         </p>
     </form>
     <?php

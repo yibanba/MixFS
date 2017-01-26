@@ -30,6 +30,7 @@ if (isset($_POST['btn_series_add'])) {              // 添加系列
     $goods_name = preg_replace("/\s|　/", "", $_POST['goods_name']); //删除所有空格和全角空格
     $goods_name = wp_strip_all_tags($goods_name);
     $goods_detail = wp_strip_all_tags($_POST['goods_detail']);
+    $per_pack = trim($_POST['goods_per_pack']);
     if (empty($goods_name)) {
         echo '<div id="message" class="updated"><p>产品名称不能为空</p></div>';
     } else {
@@ -42,7 +43,8 @@ if (isset($_POST['btn_series_add'])) {              // 添加系列
                         'gn_gs_id'=>$_GET['series_id'],
                         'gn_name' => $goods_name,
                         'gn_price' => 1,
-                        'gn_summary' => $goods_detail)
+                        'gn_summary' => $goods_detail,
+                        'gn_per_pack' => $per_pack)
             );
             echo "<div id='message' class='updated'><p>添加【{$goods_name}】产品名称成功</p></div>";
         }
@@ -89,6 +91,15 @@ function form_add_goods($acc_prefix, $series_id = '') { // 添加产品系列
                                    this.value = '';
                                    this.style.color = '#333';
                                }" />
+               <input type="text" id="goods_per_pack" name="goods_per_pack" value="输入每件双数..." maxlength="30" size="30" style="color: #ccc;" 
+                       onblur="if (this.value == '') {
+                                   this.value = '输入每件双数...';
+                                   this.style.color = '#ccc';
+                               }" 
+                       onfocus="if (this.value == '输入每件双数...') {
+                                   this.value = '';
+                                   this.style.color = '#333';
+                               }" />
                 <input type="submit" name="btn_goods_add" id="btn_goods_add" class="button" value="添加产品名称"  />
                 <input type="button" name="btn_series_return" id="btn_series_return" class="button" value="返回添加系列" 
                     onclick="location.href=location.href.substring(0, location.href.indexOf('&series_id'))" />
@@ -112,6 +123,7 @@ function show_goods($acc_prefix, $series_id = '') { // 显示产品名称列表�
             <th class = 'manage-column' style = "">产品名称</th>
             <th class = 'manage-column' style = "">产品售价</th>
             <th class = 'manage-column' style = "">产品说明</th>
+            <th class = 'manage-column' style = "">每件双数</th>
         </tr>
     </thead>
     <tfoot>
@@ -121,6 +133,7 @@ function show_goods($acc_prefix, $series_id = '') { // 显示产品名称列表�
             <th class = 'manage-column' style = "">产品名称</th>
             <th class = 'manage-column' style = "">产品售价</th>
             <th class = 'manage-column' style = "">产品说明</th>
+            <th class = 'manage-column' style = "">每件双数</th>
         </tr>
     </tfoot>
 Mix_HTML;
@@ -132,7 +145,7 @@ Mix_HTML;
         $where = " 1=1 ";
         $orderby = " ORDER BY gn_gs_id, gn_id ";
     }
-    $results_goods = $wpdb->get_results("SELECT gs_name, gn_id, gn_name, gn_price, gn_summary "
+    $results_goods = $wpdb->get_results("SELECT gs_name, gn_id, gn_name, gn_price, gn_summary, gn_per_pack "
             . " FROM {$acc_prefix}goods_name, {$acc_prefix}goods_series "
             . " WHERE {$where} AND gn_gs_id=gs_id {$orderby} ", ARRAY_A);
 
@@ -144,6 +157,7 @@ Mix_HTML;
                 <td class='name'>{$g_name['gn_name']}</td>
                 <td class='name'>{$g_name['gn_price']}</td>
                 <td class='name'>{$g_name['gn_summary']}</td>
+                <td class='name'>{$g_name['gn_per_pack']}</td>
             </tr>";
     }
     echo '</tbody>'
