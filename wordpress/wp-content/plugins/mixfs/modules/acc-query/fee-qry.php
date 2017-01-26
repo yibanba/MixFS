@@ -150,8 +150,8 @@ Form_HTML;
         } // foreach
         echo '</tbody></table>';
         
-        $fb_in = mix_num($fb_in, TRUE);
-        $fb_out = mix_num($fb_out, TRUE);
+        $fbt_in = mix_num($fb_in, TRUE);
+        $fbt_out = mix_num($fb_out, TRUE);
         $balance = mix_num(($fb_in - $fb_out), TRUE);
         echo <<<Form_HTML
         <br />
@@ -160,9 +160,9 @@ Form_HTML;
         <tr>
             <th class='manage-column' style="width:150px;">【 {$name} 】</th>
             <th class='manage-column' style="width:150px;">本期现金增加总额: </th>
-            <th class='manage-column' style="">{$fb_in}</th>
+            <th class='manage-column' style="">{$fbt_in}</th>
             <th class='manage-column'  style="width:150px;">本期现金减少总额: </th>
-            <th class='manage-column'  style="">{$fb_out}</th>
+            <th class='manage-column'  style="">{$fbt_out}</th>
             <th class='manage-column'  style="width:150px;">本期现金收支净额($): </th>
             <th class='manage-column'  style="">{$balance}</th>
         </tr>

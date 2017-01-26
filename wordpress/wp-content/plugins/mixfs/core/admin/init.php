@@ -23,6 +23,7 @@ function mixfs_admin_menus() {
         add_submenu_page('mixfs-instructions', '财务软件入口', '财务软件入口', $cap, 'mixfs-entrance', 'entrance');
         add_submenu_page('mixfs-instructions', '账套列表', '账套列表', $cap, 'accounting-list', 'accounting_list');
         add_submenu_page('mixfs-instructions', '权限分配', '权限分配', $cap, 'accounting-permission', 'accounting_permission');
+        add_submenu_page('mixfs-instructions', '登录日志', '登录日志', $cap, 'accounting-log', 'accounting_log');
     } elseif ($cap == 'mixfs_operator') {
         add_menu_page('', '米克斯财会软件', $cap, 'mixfs-instructions', 'instructions');
         add_submenu_page('mixfs-instructions', '进销存概况', '进销存概况', $cap, 'mixfs-instructions', 'instructions');
@@ -43,8 +44,13 @@ function entrance() {
 function accounting_list() {
     include_once( 'accounting-list.php' );
 }
+
 function accounting_permission() {
     include_once( 'accounting-permission.php' );
+}
+
+function accounting_log() {
+    include_once( 'accounting-log.php' );
 }
 
 
