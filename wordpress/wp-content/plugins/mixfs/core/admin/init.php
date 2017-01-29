@@ -116,7 +116,7 @@ function added_admin_bar() {
 	));
 	$wp_admin_bar->add_menu( array(
 		'id'    => 'date',
-		'title' => ' ( 2017-3-15 —— 2019-3-15 ) ',
+		'title' => ' 2016-11-30 —— 2018-11-30  ',
 		'href'  => '',
 		'parent'=>'validity'
 	));

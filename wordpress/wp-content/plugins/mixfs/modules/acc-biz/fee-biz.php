@@ -14,6 +14,9 @@ if( ! isset($_SESSION['rate'])) { // 设置当地货币转美元的汇率
     $_SESSION['rate'] = 1.000;
 }
 
+date_from_to("feebiz_date");
+
+
 if (isset($_POST['feebiz_submit'])) {
 
     $_SESSION['feebiz']['date'] = '';
@@ -44,7 +47,6 @@ if (isset($_POST['feebiz_submit'])) {
 } // if (isset($_POST['feebiz_submit']))
 
 
-date_from_to("feebiz_date");
 ?>
 
 <form action="" method="post" name="createuser" id="createuser" class="validate">
@@ -107,6 +109,12 @@ date_from_to("feebiz_date");
     </p>
 </form>
 
+
+<script type="text/javascript">
+    jQuery(document).ready(function ($) {
+        $('#message').show().delay(5000).hide(0);
+    });
+</script>
 <?php
 
 /**

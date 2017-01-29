@@ -24,6 +24,8 @@ function acc_query() {
         add_submenu_page('acc-query-instructions', '产成品查询', '产成品查询', $cap, 'goods-qry', 'goods_qry');
         add_submenu_page('acc-query-instructions', '费用明细查询', '费用明细查询', $cap, 'fee-qry', 'fee_qry');
         add_submenu_page('acc-query-instructions', '原材料查询', '原材料查询', $cap, 'stuff-qry', 'stuff_qry');
+        add_submenu_page('acc-query-instructions', '产成品业务流水', '产成品业务流水', $cap, 'goods-serial-no', 'goods_serial_no');
+        add_submenu_page('acc-query-instructions', '费用业务流水', '费用业务流水', $cap, 'fee-serial-no', 'fee_serial_no');
     }
 }
 
@@ -43,4 +45,12 @@ function fee_qry() {
 
 function stuff_qry() {
     include_once( 'stuff-qry.php' );
+}
+
+function goods_serial_no() {
+    include_once( 'goods-serial-no.php' );
+}
+
+function fee_serial_no() {
+    include_once( 'fee-serial-no.php' );
 }
