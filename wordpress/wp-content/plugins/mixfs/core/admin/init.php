@@ -8,6 +8,9 @@ function mixfs_admin_menus() {
         case 'mixfs_operator':
             $cap = 'mixfs_operator';
             break;
+        case 'mixfs_manager':
+            $cap = 'mixfs_manager';
+            break;
         case 'mixfs_assistant':
             $cap = 'mixfs_assistant';
             break;
@@ -24,7 +27,7 @@ function mixfs_admin_menus() {
         add_submenu_page('mixfs-instructions', '账套列表', '账套列表', $cap, 'accounting-list', 'accounting_list');
         add_submenu_page('mixfs-instructions', '权限分配', '权限分配', $cap, 'accounting-permission', 'accounting_permission');
         add_submenu_page('mixfs-instructions', '登录日志', '登录日志', $cap, 'accounting-log', 'accounting_log');
-    } elseif ($cap == 'mixfs_operator') {
+    } elseif ($cap == 'mixfs_operator' || $cap == 'mixfs_manager' ) {
         add_menu_page('', '米克斯财会软件', $cap, 'mixfs-instructions', 'instructions');
         add_submenu_page('mixfs-instructions', '进销存概况', '进销存概况', $cap, 'mixfs-instructions', 'instructions');
         add_submenu_page('mixfs-instructions', '财务软件入口', '财务软件入口', $cap, 'mixfs-entrance', 'entrance');

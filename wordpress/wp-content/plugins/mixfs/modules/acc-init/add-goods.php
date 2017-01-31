@@ -52,23 +52,25 @@ if (isset($_POST['btn_series_add'])) {              // 添加系列
 } elseif (isset ($_POST['btn_series_show'])) {          // 显示所有产品
     show_goods($acc_prefix);
 } 
+    
+if ( isset($_GET['series_id']) > 0 ) {
+    $_SESSION['goods_series_id'] = $_GET['series_id'];
+    $_SESSION['goods_series'] = $wpdb->get_var("SELECT gs_name FROM {$acc_prefix}goods_series WHERE gs_id='{$_SESSION['goods_series_id']}'");
 
-if ( $_GET['series_id'] > 0 ) {
-    form_add_goods($acc_prefix, $_GET['series_id']);    // 添加指定系列产品
+    form_add_goods($acc_prefix, $_SESSION['goods_series']);    // 添加指定系列产品
     show_goods($acc_prefix, $_GET['series_id']);        // 显示指定系列产品
-} else {
+}elseif ($_GET['addgoods'] == 'import') {
+
+    include_once 'addgoods-import.php';
+} // elseif ($_GET['goodspage'] == 'import')
+else {
     form_add_series($acc_prefix);                       // 添加系列名称
 }
 
 mixfs_bottom(); // 框架页面底部
 
 
-function form_add_goods($acc_prefix, $series_id = '') { // 添加产品系列
-    global $wpdb;
-
-    $series_name = $wpdb->get_row("SELECT gs_name FROM {$acc_prefix}goods_series WHERE gs_id='{$series_id}'", ARRAY_A);
-    $series_name = $series_name['gs_name'];
-    
+function form_add_goods($acc_prefix, $series_name) { // 添加产品系列
     echo <<<Mix_HTML
     <form action="" method="post">
         <div class="manage-menus">
@@ -103,6 +105,10 @@ function form_add_goods($acc_prefix, $series_id = '') { // 添加产品系列
                 <input type="submit" name="btn_goods_add" id="btn_goods_add" class="button" value="添加产品名称"  />
                 <input type="button" name="btn_series_return" id="btn_series_return" class="button" value="返回添加系列" 
                     onclick="location.href=location.href.substring(0, location.href.indexOf('&series_id'))" />
+            </div>
+            <div class="alignright actions">
+            <input type="button" name="goods_import" id="goods_import" class="button" value="Excel 批量导入" 
+                   onclick="location.href = location.href.substring(0, location.href.indexOf('&series_id')) + '&addgoods=import'" />
             </div>
             <br class="clear" />
         </div>

@@ -122,7 +122,7 @@ if (isset($_POST['btn_add_op'])) {
                             <input name='ma_tbl_name{$tbl['ma_id']}' type='text' value='{$tbl['ma_tbl_name']}' size='20' readonly='readonly' />
                         </td>
                         <td class='name'>
-                            <input name='ma_tbl_user' type='text' value='{$user_str}' size='30' readonly='readonly' />
+                            <input name='ma_tbl_user' type='text' value='{$user_str}' size='60' readonly='readonly' />
                         </td>
                     </tr>";
             endforeach;

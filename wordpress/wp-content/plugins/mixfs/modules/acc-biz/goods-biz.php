@@ -112,7 +112,7 @@ elseif ($_GET['goodspage'] == 2) {
         </div>
         <div class="alignright actions">
             <input type="button" name="goodsbiz_import" id="goodsbiz_import" class="button" value="Excel 批量导入" 
-                   onclick="location.href = location.href.substring(0, location.href.indexOf('&goods')) + '&goodspage=import'" />
+                   onclick="location.href = location.href.substring(0, location.href.indexOf('&goodspage')) + '&goodspage=import'" />
         </div>
         <br class="clear" />
     </div>

@@ -108,7 +108,7 @@ function date_from_to($tag_from, $tag_to = '') {
     jQuery(document).ready(function($) {
         $( "#{$tag_from}" ).datepicker({
             defaultDate: "-1M",
-            numberOfMonths: 2,
+            numberOfMonths: 1,
             minDate: new Date(2015, 1 - 1, 1),
             maxDate: "+1d",
             monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
@@ -125,7 +125,7 @@ DateJS;
     jQuery(document).ready(function($) {
         $( "#{$tag_from}" ).datepicker({
           defaultDate: "-1M",
-          numberOfMonths: 2,
+          numberOfMonths: 1,
             monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
             dayNamesMin: [ "日","一","二","三","四","五","六" ],
             dateFormat: "yy-mm-dd",
@@ -135,7 +135,7 @@ DateJS;
         });
         $( "#{$tag_to}" ).datepicker({
             defaultDate: "-1M",
-            numberOfMonths: 2,
+            numberOfMonths: 1,
             monthNames: [ "一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月" ],
             dayNamesMin: [ "日","一","二","三","四","五","六" ],
             dateFormat: "yy-mm-dd",
