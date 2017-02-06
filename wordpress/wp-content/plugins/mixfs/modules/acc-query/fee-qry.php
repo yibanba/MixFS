@@ -102,7 +102,7 @@ function qry_fee_detail($acc_prefix, $startday, $endday, $fs_id=0, $fi_id=0) {
                 FROM {$acc_prefix}fee_biz, {$acc_prefix}fee_item,  {$acc_prefix}fee_series
                 WHERE fb_date BETWEEN  '{$startday}' AND  '{$endday}' 
                        AND {$where} AND fb_fi_id = fi_id AND fi_fs_id = fs_id
-                ORDER BY fs_order, fi_order";
+                ORDER BY fb_date, fb_id";
     $fee_items = $wpdb->get_results($sql, ARRAY_N);
 
     if (count($fee_items) > 0) {
@@ -168,8 +168,10 @@ Form_HTML;
         </tr>
     </thead>
 Form_HTML;
-    }
     echo '</table><br />';
+    } else {
+        echo "<div id='message' class='updated'><p> {$_SESSION['qry_date']['date1']} —— {$_SESSION['qry_date']['date2']} 本期间没有业务，请重新选择起止时间</p></div>";
+    }
         
 }
 /**

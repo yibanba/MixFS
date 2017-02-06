@@ -160,20 +160,22 @@ Form_HTML;
     $counter = 2;           // 产品和原材料占用 2 行
 
     if (count($r_fee) > 0) {
-        $pre_fee = 0;
+        $pre_fee = 0; // 判断是否和前一个费用系列id相等
         foreach ($r_fee as $fields) {
+            $url_fee = "onclick=\"javascript:location.href=location.href.substring(0, location.href.indexOf('?page')) + '?page=fee-qry&fs_id={$fields[0]}'\"";
+            $url_item = "onclick=\"javascript:location.href=location.href.substring(0, location.href.indexOf('?page')) + '?page=fee-qry&fi_id={$fields[2]}'\"";
             $counter++;
             if ($fields[0] == $pre_fee) {
                 echo "<tr class='alternate'>
                         <td class='name'>{$counter}</td>
-                        <td class='name'> ... </td>
-                        <td class='name'>{$fields[3]}</td>";
+                        <td class='name'><span {$url_fee}> ... </span></td>
+                        <td class='name'><span {$url_item}>{$fields[3]}</span></td>";
             } else {
                 $pre_fee = $fields[0];
                 echo "<tr class='alternate'>
                         <td class='name'>{$counter}</td>
-                        <td class='name'>{$fields[1]}</td>
-                        <td class='name'>{$fields[3]}</td>";
+                        <td class='name'><span {$url_fee}>{$fields[1]}</span></td>
+                        <td class='name'><span {$url_item}>{$fields[3]}</span></td>";
             }
 
             // fb_in, fb_out不应该同时有金额，所以相加$fields[4] + $fields[5]求前期余额
@@ -202,17 +204,20 @@ Form_HTML;
     <table class="wp-list-table widefat fixed users" cellspacing="1">
     <thead>
         <tr>
-            <th class='manage-column' style="" colspan='2'>前期现金余额: </th>
-            <th class='manage-column' style="" colspan='2'>本期盈亏: </th>
-            <th class='manage-column' style="" colspan='2'>本期现金余额($): </th>
+            <th class='manage-column'>前期现金余额: </th>
+            <th class='manage-column'>✚</th>
+            <th class='manage-column'>本期盈亏: </th>
+            <th class='manage-column'>〓</th>
+            <th class='manage-column'>本期现金余额($): </th>
+            <th class='manage-column'> </th>
         </tr>
         <tr class='alternate'>
-            <th class='manage-column'>{$pre}</th>
-            <th class='manage-column'>✚</th>
-            <th class='manage-column'>{$cur}</th>
-            <th class='manage-column'> 〓 </th>
-            <th class='manage-column'>{$balance}</th>
-            <th class='manage-column'> </th>
+            <td class='name'>{$pre}</td>
+            <td class='name'> </td>
+            <td class='name'>{$cur}</td>
+            <td class='name'> </td>
+            <td class='name'>{$balance}</td>
+            <td class='name'> </td>
         </tr>
     </thead>
 Form_HTML;

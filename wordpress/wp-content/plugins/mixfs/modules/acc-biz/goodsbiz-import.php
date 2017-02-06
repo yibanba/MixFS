@@ -153,16 +153,16 @@ function read_excel($ver, $gn_kv) {
     $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
     //var_dump($sheetData);
     echo '<table border="1" width="500px" style="margin:20px 0px;">';
-    $row_no = 0;
+    $row_no = 1;
     $err_num = 0;
     foreach ($sheetData as $value) {
         $err_tips = '';
         if ($value['A'] == '' || $value['B'] == '') {
             break;
         } else {
-            if ($row_no == 0) {
+            if ($row_no == 1) {
                 echo "<tr style='background-color: #F9F9F9'>"
-                . "<th style='padding:5px'>行数</th>"
+                . "<th style='padding:5px'>1</th>"
                 . "<th style='padding:5px'>{$value['A']}</th>"
                 . "<th style='padding:5px'>{$value['B']}</th>"
                 . "<th style='padding:5px'>{$value['C']}</th>"

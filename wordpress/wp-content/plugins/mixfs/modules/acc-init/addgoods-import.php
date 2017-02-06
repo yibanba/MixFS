@@ -114,14 +114,14 @@ function read_excel($ver, $gn_kv) {
     $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
     //var_dump($sheetData);
     echo '<table border="1" width="500px" style="margin:20px 0px;">';
-    $row_no = 0;
+    $row_no = 1;  // 序号不含标题
     $err_num = 0;
     foreach ($sheetData as $value) {
         $err_tips = '';
         if ($value['A'] == '' || $value['B'] == '') {
             break;
         } else {
-            if ($row_no == 0) { // 5列：行数，品名，件双，摘要，错误提示
+            if ($row_no == 1) { // 5列：行数，品名，件双，摘要，错误提示
                 echo "<tr style='background-color: #F9F9F9'>"
                 . "<th style='padding:5px'>行数</th>"
                 . "<th style='padding:5px'>{$value['A']}</th>"
