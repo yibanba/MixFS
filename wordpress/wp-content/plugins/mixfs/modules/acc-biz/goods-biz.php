@@ -74,14 +74,14 @@ elseif (isset($_POST['goodsbiz_submit'])) {
             $wpdb->insert($acc_prefix . 'goods_biz', array('gb_date' => $_SESSION['goodsbiz']['date'],
                 'gb_gp_id' => $_SESSION['goodsbiz']['out'],
                 'gb_out' => $goods_num,
-                'gb_money' => ($money / $_SESSION['rate']),
+                'gb_money' => ($money * $goods_num / $_SESSION['rate']), // 单价(z) * 数量(件*双) / 美元汇率 = $销售额
                 'gb_summary' => trim($_POST['goodsbiz_sum']),
                 'gb_gn_id' => $goods_name
                     )
             );
             if($money > 0) { // 正常销售，不含退货
                 $wpdb->update( $acc_prefix . 'goods_name', 
-                    array( 'gn_price' => number_format(($money/$goods_num) / $_SESSION['rate'],2) ), 
+                    array( 'gn_price' => number_format($money / $_SESSION['rate'],2) ), 
                     array( 'gn_id' => $goods_name ), 
                     array( '%.2f' ), array( '%d' ) );
             }
