@@ -6,17 +6,15 @@ mixfs_top('费用业务流水', $_SESSION['acc_name']);
 global $wpdb;
 $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
 
-isset($_SESSION['fee_qry_date']['date1']) ?: $_SESSION['fee_qry_date']['date1'] = date("Y-m-d", strtotime("-1 months"));
-isset($_SESSION['fee_qry_date']['date2']) ?: $_SESSION['fee_qry_date']['date2'] = date("Y-m-d");
+isset($_SESSION['fee_qry_date']) ?: $_SESSION['fee_qry_date'] = date("Y-m-d");
 
 
 if (isset($_POST['btn_fee_biz'])) {
-    $_SESSION['fee_qry_date']['date1'] = $_POST['fee_qry_date1'];
-    $_SESSION['fee_qry_date']['date2'] = $_POST['fee_qry_date2'];
-    form_qry_goods($_SESSION['fee_qry_date']['date1'], $_SESSION['fee_qry_date']['date2']);
-    feebiz_list($acc_prefix, $_SESSION['fee_qry_date']['date1'], $_SESSION['fee_qry_date']['date2']);
+    $_SESSION['fee_qry_date'] = $_POST['fee_qry_date'];
+    form_qry_goods($_SESSION['fee_qry_date']);
+    feebiz_list($acc_prefix, $_SESSION['fee_qry_date']);
 } else {
-    form_qry_goods($_SESSION['fee_qry_date']['date1'], $_SESSION['fee_qry_date']['date2']);
+    form_qry_goods($_SESSION['fee_qry_date']);
 }
 ?>
 <script type="text/javascript">
@@ -37,20 +35,17 @@ mixfs_bottom(); // 框架页面底部
 /**
  * 默认查询表单
  */
-function form_qry_goods($startday, $endday) {
+function form_qry_goods($day) {
     ?>
     <form action="" method="post">
         <div class="manage-menus">
             <!--# 汇总查询库存和销售 -->
             <div class="alignleft actions" id="sale_inventory">
-                <label for="fee_qry_date1">指定起始日期
-                    <input name="fee_qry_date1" type="text" id="fee_qry_date1" value="<?php echo $startday; ?>">
-                </label>
-                <label for="fee_qry_date2">指定截止日期
-                    <input name="fee_qry_date2" type="text" id="fee_qry_date2" value="<?php echo $endday; ?>">
+                <label for="fee_qry_date">指定业务发生日期
+                    <input name="fee_qry_date" type="text" id="fee_qry_date" value="<?php echo $day; ?>">
                 </label>
                 <?php
-                date_from_to("fee_qry_date1", "fee_qry_date2");
+                date_from_to("fee_qry_date");
                 ?>
                 <input type="submit" name="btn_fee_biz" id="btn_fee_biz" class="button button-primary" value="费用业务流水查询"  />
             </div>
@@ -66,7 +61,7 @@ function form_qry_goods($startday, $endday) {
  * 显示最近提交业务流水
  * 所有页面显示的最近 10 条业务流水
  */
-function feebiz_list($acc_prefix, $startday, $endday) {
+function feebiz_list($acc_prefix, $day) {
     global $wpdb;
 
 
@@ -108,7 +103,7 @@ Form_HTML;
 
     $results_feebiz = $wpdb->get_results("SELECT fb_id, fb_date, fs_name, fi_name, fb_in, fb_out, fb_c_id, fb_summary "
             . " FROM {$acc_prefix}fee_biz, {$acc_prefix}fee_item, {$acc_prefix}fee_series "
-            . " WHERE fb_date BETWEEN '{$startday}' AND '{$endday}' AND fi_fs_id = fs_id AND fb_fi_id = fi_id"
+            . " WHERE fb_date = '{$endday}' AND fi_fs_id = fs_id AND fb_fi_id = fi_id"
             . " ORDER BY fb_date, fb_id DESC ", ARRAY_A);
 
     foreach ($results_feebiz as $fb) {

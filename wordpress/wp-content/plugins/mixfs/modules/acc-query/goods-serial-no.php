@@ -1,23 +1,20 @@
 <?php
-if (!defined('ABSPATH'))
-    exit; // Exit if accessed directly
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 mixfs_top('产成品业务流水', $_SESSION['acc_name']);
 
 global $wpdb;
 $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
 
-isset($_SESSION['goods_qry_date']['date1']) ?: $_SESSION['goods_qry_date']['date1'] = date("Y-m-d", strtotime("-1 months"));
-isset($_SESSION['goods_qry_date']['date2']) ?: $_SESSION['goods_qry_date']['date2'] = date("Y-m-d");
+isset($_SESSION['goods_qry_date']) ?: $_SESSION['goods_qry_date'] = date("Y-m-d");
 
 
 if(isset($_POST['btn_goods_biz'])) {
-    $_SESSION['goods_qry_date']['date1'] = $_POST['goods_qry_date1'];
-    $_SESSION['goods_qry_date']['date2'] = $_POST['goods_qry_date2'];
-    form_qry_goods($_SESSION['goods_qry_date']['date1'], $_SESSION['goods_qry_date']['date2']);
-    goodsbiz_list($acc_prefix, $_SESSION['goods_qry_date']['date1'], $_SESSION['goods_qry_date']['date2']);
+    $_SESSION['goods_qry_date'] = $_POST['goods_qry_date'];
+    form_qry_goods($_SESSION['goods_qry_date']);
+    goodsbiz_list($acc_prefix, $_SESSION['goods_qry_date']);
 } else {
-    form_qry_goods($_SESSION['goods_qry_date']['date1'], $_SESSION['goods_qry_date']['date2']);
+    form_qry_goods($_SESSION['goods_qry_date']);
 }
 
 ?>
@@ -41,20 +38,17 @@ mixfs_bottom(); // 框架页面底部
 /**
  * 默认查询表单
  */
-function form_qry_goods($startday, $endday) {
+function form_qry_goods($day) {
     ?>
     <form action="" method="post">
         <div class="manage-menus">
             <!--# 汇总查询库存和销售 -->
             <div class="alignleft actions" id="sale_inventory">
-                <label for="goods_qry_date1">指定起始日期
-                    <input name="goods_qry_date1" type="text" id="goods_qry_date1" value="<?php echo $startday; ?>">
-                </label>
-                <label for="goods_qry_date2">指定截止日期
-                    <input name="goods_qry_date2" type="text" id="goods_qry_date2" value="<?php echo $endday; ?>">
+                <label for="goods_qry_date">指定业务发生日期
+                    <input name="goods_qry_date" type="text" id="goods_qry_date" value="<?php echo $day; ?>">
                 </label>
     <?php
-    date_from_to("goods_qry_date1", "goods_qry_date2");
+    date_from_to("goods_qry_date");
     ?>
                 <input type="submit" name="btn_goods_biz" id="btn_goods_biz" class="button button-primary" value="产成品业务流水查询"  />
             </div>
@@ -72,7 +66,7 @@ function form_qry_goods($startday, $endday) {
  * 显示最近提交业务流水
  * 所有页面显示的最近 10 条业务流水
  */
-function goodsbiz_list($acc_prefix, $startday, $endday) {
+function goodsbiz_list($acc_prefix, $day) {
     global $wpdb;
     echo <<<Form_HTML
         <table class="wp-list-table widefat fixed users" cellspacing="1">
@@ -112,7 +106,7 @@ Form_HTML;
 // 产成品业务列表
     $results_goodsbiz = $wpdb->get_results("SELECT gb_id, gb_date, gs_name, gn_name, gb_in, gb_out, gb_money, gb_gp_id, gb_summary, gn_per_pack "
             . " FROM {$acc_prefix}goods_biz, {$acc_prefix}goods_name, {$acc_prefix}goods_series "
-            . " WHERE gb_date BETWEEN '{$startday}' AND '{$endday}' AND gb_gn_id = gn_id AND gn_gs_id = gs_id "
+            . " WHERE gb_date = '{$day}' AND gb_gn_id = gn_id AND gn_gs_id = gs_id "
             . " ORDER BY gb_date,gb_id  ", ARRAY_A);
 
     $gp_total = $wpdb->get_results("SELECT gp_id FROM {$acc_prefix}goods_place", ARRAY_A);
@@ -165,8 +159,6 @@ Form_HTML;
     
     foreach ($gp_total as $value) {
         $place = id2name("gp_name", "{$acc_prefix}goods_place", $value['gp_id'], "gp_id");
-        //echo '<br />' . $place . '入库合计: ' . $gp[$value['gp_id']]['in'];      // 指定仓库入库初始化 0
-        //echo '<br />' . $place . '出库合计: ' . $gp[$value['gp_id']]['out'];      // 指定仓库入库初始化 0
         echo "<tr class='alternate'>
                     <td class='name'>{$value['gp_id']}</td>
                     <td class='name'>{$place}</td>
@@ -176,4 +168,4 @@ Form_HTML;
     }
     echo '</tbody></table>';
     
-} // function goodsbiz_list($acc_prefix, $startday, $endday)
+} // function goodsbiz_list($acc_prefix, $day)
