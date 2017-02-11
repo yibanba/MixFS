@@ -296,16 +296,6 @@ elseif ($_GET['goodspage'] == 'import') {
 } // elseif ($_GET['goodspage'] == 'import')
 
 
-
-?>
-    <script type="text/javascript">
-        jQuery(document).ready(function ($) {
-            $('#message').show().delay(5000).hide(0);
-        });
-    </script>
-<?php
-
-
 mixfs_bottom(); // 框架页面底部
 //******************************************************************************
 
