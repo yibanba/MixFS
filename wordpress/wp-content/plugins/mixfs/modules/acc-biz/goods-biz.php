@@ -17,9 +17,9 @@ if( ! isset($_SESSION['rate'])) { // 设置当地货币转美元的汇率
 if (isset($_POST['goodsbiz_1'])) { // 处理表单提交
 
     $_SESSION['goodsbiz']['date'] = '';
-    $_SESSION['goodsbiz']['inout'] = '';
-    $_SESSION['goodsbiz']['in'] = '';
-    $_SESSION['goodsbiz']['out'] = '';
+    $_SESSION['goodsbiz']['inout'] = '';    // 入库、移库、销售或退回
+    $_SESSION['goodsbiz']['in'] = '';       // 入库地点
+    $_SESSION['goodsbiz']['out'] = '';      // 出库地点
     $date_arr = explode('-', $_POST['goodsbiz_date']);
     $err = '';
 
@@ -314,8 +314,8 @@ function goodsbiz_list($acc_prefix, $total = '') {
                     <th class='manage-column'  style="">系列</th>
                     <th class='manage-column'  style="">型号</th>
                     <th class='manage-column'  style="">仓库</th>
-                    <th class='manage-column'  style="">入库</th>
-                    <th class='manage-column'  style="">出库</th>
+                    <th class='manage-column'  style="">入库 <span style="color:#AAA;">[件数]</span></th>
+                    <th class='manage-column'  style="">出库 <span style="color:#AAA;">[件数]</span></th>
                     <th class='manage-column'  style="">金额</th>
                     <th class='manage-column'  style="">业务摘要</th>
                 </tr>
@@ -328,8 +328,8 @@ function goodsbiz_list($acc_prefix, $total = '') {
                     <th class='manage-column'  style="">系列</th>
                     <th class='manage-column'  style="">型号</th>
                     <th class='manage-column'  style="">仓库</th>
-                    <th class='manage-column'  style="">入库</th>
-                    <th class='manage-column'  style="">出库</th>
+                    <th class='manage-column'  style="">入库 <span style="color:#AAA;">[件数]</span></th>
+                    <th class='manage-column'  style="">出库 <span style="color:#AAA;">[件数]</span></th>
                     <th class='manage-column'  style="">金额</th>
                     <th class='manage-column'  style="">业务摘要</th>
                 </tr>
@@ -340,15 +340,15 @@ Form_HTML;
 
 // 产成品业务列表
     $limit = ($total == '') ? "" : " LIMIT {$total}";
-    $results_goodsbiz = $wpdb->get_results("SELECT gb_id, gb_date, gs_name, gn_name, gb_in, gb_out, gb_money, gb_gp_id, gb_summary "
+    $results_goodsbiz = $wpdb->get_results("SELECT gb_id, gb_date, gs_name, gn_name, gb_in, gb_out, gb_money, gb_gp_id, gb_summary, gn_per_pack "
             . " FROM {$acc_prefix}goods_biz, {$acc_prefix}goods_name, {$acc_prefix}goods_series "
             . " WHERE gb_gn_id = gn_id AND gn_gs_id = gs_id "
             . " ORDER BY gb_id DESC $limit", ARRAY_A);
 
     foreach ($results_goodsbiz as $gb) {
         $place = id2name("gp_name", "{$acc_prefix}goods_place", $gb['gb_gp_id'], "gp_id");
-        $in_number =  ( $gb['gb_in'] == 0 ) ?  '' : number_format($gb['gb_in'], 0);
-        $out_number = ( $gb['gb_out'] == 0 ) ?  '' : number_format($gb['gb_out'], 0);
+        $in_number =  ( $gb['gb_in'] == 0 ) ?  '' : number_format($gb['gb_in'], 0) . ' <span style="color:#AAA;">[' . ($gb['gb_in'] / $gb['gn_per_pack']) . ']</span>';
+        $out_number = ( $gb['gb_out'] == 0 ) ?  '' : number_format($gb['gb_out'], 0) . ' <span style="color:#AAA;">[' . ($gb['gb_out'] / $gb['gn_per_pack']) . ']</span>';
         $money = ($gb['gb_money'] == 0) ? '' : number_format($gb['gb_money'], 2);
             echo "<tr class='alternate'>
                     <td class='name'>{$gb['gb_id']}</td>

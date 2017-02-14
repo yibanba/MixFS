@@ -1,6 +1,5 @@
 <?php
-if (!defined('ABSPATH'))
-    exit; // Exit if accessed directly
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 mixfs_top('原材料业务', $_SESSION['acc_name']);
 
@@ -10,9 +9,11 @@ $acc_prefix = $wpdb->prefix . 'mixfs_' . $_SESSION['acc_tbl'] . '_';
 
 if (isset($_POST['stuffbiz_1'])) {
 
-    $_SESSION['stuffbiz']['date']='';
-    $_SESSION['stuffbiz']['inout']=0;
-    
+    $_SESSION['stuffbiz']['date'] = '';
+    $_SESSION['stuffbiz']['inout'] = '';        // 入库、移库、销售或退回
+    $_SESSION['stuffbiz']['provider'] = '';     // 供货商
+    $_SESSION['stuffbiz']['container'] = '';    // 货柜号
+
     $date_arr = explode('-', $_POST['stuffbiz_date']);
     if (count($date_arr) == 3 && checkdate($date_arr[1], $date_arr[2], $date_arr[0])) {
         $_SESSION['stuffbiz']['date'] = $_POST['stuffbiz_date'];
@@ -25,7 +26,14 @@ if (isset($_POST['stuffbiz_1'])) {
         echo '<div id="message" class="updated"><p>请选择出入库再继续操作</p></div>';
     }
 
-    if ($_SESSION['stuffbiz']['date'] && $_SESSION['stuffbiz']['inout']) {
+    if (isset($_POST['stuffbiz_provider']) && isset($_POST['stuffbiz_container'])) {
+        $_SESSION['stuffbiz']['provider'] = $_POST['stuffbiz_provider'];
+        $_SESSION['stuffbiz']['container'] = $_POST['stuffbiz_container'];
+    } else {
+        echo '<div id="message" class="updated"><p>请选择供货商和货柜号再继续操作</p></div>';
+    }
+
+    if ($_SESSION['stuffbiz']['date'] && $_SESSION['stuffbiz']['inout'] && $_SESSION['stuffbiz']['provider'] && $_SESSION['stuffbiz']['container']) {
         echo "<script type='text/javascript'>location.href=location.href + '&stuffpage=2';</script>";
     }
 } // if (isset($_POST['stuffbiz_1']))
@@ -37,8 +45,8 @@ elseif (isset($_POST['stuffbiz_2'])) {
         $wpdb->insert($acc_prefix . 'stuff_biz', array('sb_date' => $_SESSION['stuffbiz']['date'],
             $in_out => $stuff_num,
             'sb_money' => trim($_POST['stuffbiz_money']),
-            'sb_p_id' => $_POST['stuffbiz_provider'],
-            'sb_c_id' => $_POST['stuffbiz_container'],
+            'sb_p_id' => $_SESSION['stuffbiz']['provider'],
+            'sb_c_id' => $_SESSION['stuffbiz']['container'],
             'sb_summary' => trim($_POST['stuffbiz_sum']),
             'sb_sn_id' => $stuff_name
                 )
@@ -69,6 +77,34 @@ if (!isset($_GET['stuffpage'])) {
                         <label><input name="stuffbiz_inout" type="radio" value="2" style="width: 25px;">出库</label>
                     </td>
                 </tr>
+                <tr class="form-field">
+                    <th scope="row"><label for="stuffbiz_provider">供应商</label></th>
+                    <td>
+                        <select name="stuffbiz_provider" id="stuffbiz_provider" style="width: 25em;">
+                            <option selected="selected" value="0">请选择供应商</option>
+                            <?php
+                            $providers = $wpdb->get_results("SELECT p_id, p_name FROM {$acc_prefix}provider ORDER BY p_name", ARRAY_A);
+                            foreach ($providers as $p) {
+                                printf('<option value="%d">%s</option>', $p['p_id'], $p['p_name']);
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr class="form-field">
+                    <th scope="row"><label for="stuffbiz_container">货柜号</label></th>
+                    <td>
+                        <select name="stuffbiz_container" id="stuffbiz_container" style="width: 25em;">
+                            <option selected="selected" value="0">请选择货柜号</option>
+                            <?php
+                            $containers = $wpdb->get_results("SELECT c_id, c_no FROM {$acc_prefix}container ORDER BY c_no", ARRAY_A);
+                            foreach ($containers as $c) {
+                                printf('<option value="%d">%s</option>', $c['c_id'], $c['c_no']);
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
             </tbody>
         </table>
 
@@ -84,7 +120,14 @@ elseif ($_GET['stuffpage'] == 2) {
     ?>
     <div class="manage-menus">
         <div class="alignleft actions">
-            <span><?php echo '当前日期：【' . $_SESSION['stuffbiz']['date'] . '】， 业务类型：【' . $_SESSION['stuffbiz']['inout'] . '】'; ?></span>
+            <span>
+                <?php
+                echo '当前日期：【' . $_SESSION['stuffbiz']['date'] . '】， 业务类型：【'
+                . $_SESSION['stuffbiz']['inout'] . '】， 供货商：【'
+                . id2name('p_name', $acc_prefix . 'provider', $_SESSION['stuffbiz']['provider'], 'p_id') . '】， 货柜号：【'
+                . id2name('c_no', $acc_prefix . 'container', $_SESSION['stuffbiz']['container'], 'c_id') . '】';
+                ?>
+            </span>
         </div>
         <br class="clear" />
     </div>
@@ -93,50 +136,22 @@ elseif ($_GET['stuffpage'] == 2) {
         <table class="form-table">
             <tbody>
                 <tr class="form-field">
-                    <th scope="row"><label for="stuffbiz_provider">供应商</label></th>
-                    <td>
-                        <select name="stuffbiz_provider" id="stuffbiz_provider" style="width: 25em;">
-                            <option selected="selected" value="0">请选择供应商</option>
-    <?php
-    $providers = $wpdb->get_results("SELECT p_id, p_name FROM {$acc_prefix}provider ORDER BY p_name", ARRAY_A);
-    foreach ($providers as $p) {
-        printf('<option value="%d">%s</option>', $p['p_id'], $p['p_name']);
-    }
-    ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr class="form-field">
-                    <th scope="row"><label for="stuffbiz_container">货柜号</label></th>
-                    <td>
-                        <select name="stuffbiz_container" id="stuffbiz_container" style="width: 25em;">
-                            <option selected="selected" value="0">请选择货柜号</option>
-    <?php
-    $containers = $wpdb->get_results("SELECT c_id, c_no FROM {$acc_prefix}container ORDER BY c_no", ARRAY_A);
-    foreach ($containers as $c) {
-        printf('<option value="%d">%s</option>', $c['c_id'], $c['c_no']);
-    }
-    ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr class="form-field">
                     <th scope="row"><label for="stuffbiz_name">原材料名称 (必填)</label></th>
                     <td><input type="text" name="stuffbiz_name" id="stuffbiz_name" value="双击选择或输入关键字"></td>
                 </tr>
-    <?php
-    // 自动完成文本框，选择原材料名称
-    $get_cols = $wpdb->get_results("SELECT ss_name, sn_name, sn_id FROM {$acc_prefix}stuff_name, {$acc_prefix}stuff_series "
-            . " WHERE sn_ss_id=ss_id ORDER BY sn_ss_id, sn_name", ARRAY_A);
+                <?php
+                // 自动完成文本框，选择原材料名称
+                $get_cols = $wpdb->get_results("SELECT ss_name, sn_name, sn_id FROM {$acc_prefix}stuff_name, {$acc_prefix}stuff_series "
+                        . " WHERE sn_ss_id=ss_id ORDER BY sn_ss_id, sn_name", ARRAY_A);
 
-    $cols_str = '';
-    foreach ($get_cols as $value) {
-        $cols_str .= '{ label: "' . $value['sn_name'] . '", category: "' . $value['ss_name'] . ' 系列"},';
-    }
-    $cols_format = rtrim($cols_str, ',');
+                $cols_str = '';
+                foreach ($get_cols as $value) {
+                    $cols_str .= '{ label: "' . $value['sn_name'] . '", category: "' . $value['ss_name'] . ' 系列"},';
+                }
+                $cols_format = rtrim($cols_str, ',');
 
-    autocompletejs($cols_format, 'stuffbiz_name');
-    ?>
+                autocompletejs($cols_format, 'stuffbiz_name');
+                ?>
                 <tr class="form-field">
                     <th scope="row"><label for="stuffbiz_num">数量 (必填)</label></th>
                     <td><input name="stuffbiz_num" type="text" id="stuffbiz_num" value=""></td>

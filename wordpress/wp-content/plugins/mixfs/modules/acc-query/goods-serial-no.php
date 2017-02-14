@@ -13,6 +13,14 @@ if(isset($_POST['btn_goods_biz'])) {
     $_SESSION['goods_qry_date'] = $_POST['goods_qry_date'];
     form_qry_goods($_SESSION['goods_qry_date']);
     goodsbiz_list($acc_prefix, $_SESSION['goods_qry_date']);
+} elseif (isset($_POST['btn_goods_biz_prev'])) {
+    $_SESSION['goods_qry_date'] = date("Y-m-d", strtotime("{$_POST['goods_qry_date']}, -1 day"));
+    form_qry_goods($_SESSION['goods_qry_date']);
+    goodsbiz_list($acc_prefix, $_SESSION['goods_qry_date']);
+} elseif (isset($_POST['btn_goods_biz_last'])) {
+    $_SESSION['goods_qry_date'] = date("Y-m-d", strtotime("{$_POST['goods_qry_date']}, +1 day"));
+    form_qry_goods($_SESSION['goods_qry_date']);
+    goodsbiz_list($acc_prefix, $_SESSION['goods_qry_date']);
 } else {
     form_qry_goods($_SESSION['goods_qry_date']);
 }
@@ -51,6 +59,9 @@ function form_qry_goods($day) {
     date_from_to("goods_qry_date");
     ?>
                 <input type="submit" name="btn_goods_biz" id="btn_goods_biz" class="button button-primary" value="产成品业务流水查询"  />
+                &nbsp; 
+                <input type="submit" name="btn_goods_biz_prev" id="btn_goods_biz_prev" class="button" value="<<< 前一天"  />
+                <input type="submit" name="btn_goods_biz_last" id="btn_goods_biz_last" class="button" value="后一天 >>>"  />
             </div>
 
             <br class="clear" />

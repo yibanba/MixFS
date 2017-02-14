@@ -13,6 +13,14 @@ if (isset($_POST['btn_fee_biz'])) {
     $_SESSION['fee_qry_date'] = $_POST['fee_qry_date'];
     form_qry_goods($_SESSION['fee_qry_date']);
     feebiz_list($acc_prefix, $_SESSION['fee_qry_date']);
+} elseif (isset($_POST['btn_fee_biz_prev'])) {
+    $_SESSION['fee_qry_date'] = date("Y-m-d", strtotime("{$_POST['fee_qry_date']}, -1 day"));
+    form_qry_goods($_SESSION['fee_qry_date']);
+    feebiz_list($acc_prefix, $_SESSION['fee_qry_date']);
+} elseif (isset($_POST['btn_fee_biz_last'])) {
+    $_SESSION['fee_qry_date'] = date("Y-m-d", strtotime("{$_POST['fee_qry_date']}, +1 day"));
+    form_qry_goods($_SESSION['fee_qry_date']);
+    feebiz_list($acc_prefix, $_SESSION['fee_qry_date']);
 } else {
     form_qry_goods($_SESSION['fee_qry_date']);
 }
@@ -48,6 +56,9 @@ function form_qry_goods($day) {
                 date_from_to("fee_qry_date");
                 ?>
                 <input type="submit" name="btn_fee_biz" id="btn_fee_biz" class="button button-primary" value="费用业务流水查询"  />
+                &nbsp; 
+                <input type="submit" name="btn_fee_biz_prev" id="btn_fee_biz_prev" class="button" value="<<< 前一天"  />
+                <input type="submit" name="btn_fee_biz_last" id="btn_fee_biz_last" class="button" value="后一天 >>>"  />
             </div>
 
             <br class="clear" />
@@ -103,7 +114,7 @@ Form_HTML;
 
     $results_feebiz = $wpdb->get_results("SELECT fb_id, fb_date, fs_name, fi_name, fb_in, fb_out, fb_c_id, fb_summary "
             . " FROM {$acc_prefix}fee_biz, {$acc_prefix}fee_item, {$acc_prefix}fee_series "
-            . " WHERE fb_date = '{$endday}' AND fi_fs_id = fs_id AND fb_fi_id = fi_id"
+            . " WHERE fb_date = '{$day}' AND fi_fs_id = fs_id AND fb_fi_id = fi_id"
             . " ORDER BY fb_date, fb_id DESC ", ARRAY_A);
 
     foreach ($results_feebiz as $fb) {

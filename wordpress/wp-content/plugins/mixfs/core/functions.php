@@ -255,7 +255,7 @@ autoJS;
  */
 function mix_num($old_num, $cash=FALSE, $placeholder='') {
     if($cash) {
-        return ($old_num != 0) ? number_format($old_num, 2) : $placeholder;
+        return ($old_num != 0) ? number_format($old_num, $cash) : $placeholder;
     }
     return ($old_num == 0) ? '' : $old_num;
 }
