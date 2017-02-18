@@ -71,10 +71,11 @@ elseif (isset($_POST['goodsbiz_submit'])) {
         $money = trim($_POST['goodsbiz_money']);
         $_SESSION['rate'] = trim($_POST['goodsbiz_rate']);
         if ($goods_name && ($goods_num * $money > 0) && $_SESSION['rate']) {
+            $gb_money = ($money < 0 && $goods_num < 0) ? (-1 * $money * $goods_num) : ($money * $goods_num); // 退货 - 
             $wpdb->insert($acc_prefix . 'goods_biz', array('gb_date' => $_SESSION['goodsbiz']['date'],
                 'gb_gp_id' => $_SESSION['goodsbiz']['out'],
                 'gb_out' => $goods_num,
-                'gb_money' => ($money * $goods_num / $_SESSION['rate']), // 单价(z) * 数量(件*双) / 美元汇率 = $销售额
+                'gb_money' => ( $gb_money / $_SESSION['rate']), // 单价(z) * 数量(件*双) / 美元汇率 = $销售额
                 'gb_summary' => trim($_POST['goodsbiz_sum']),
                 'gb_gn_id' => $goods_name
                     )

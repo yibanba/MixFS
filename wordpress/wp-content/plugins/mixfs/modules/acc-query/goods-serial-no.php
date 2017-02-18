@@ -128,10 +128,10 @@ Form_HTML;
         $gp[$value['gp_id']]['out'] = 0;     // 指定仓库出库初始化 0
     }
     foreach ($results_goodsbiz as $gb) {
-        if($gb['gb_in'] > 0) {      // 累计入库件数
+        if($gb['gb_in'] != 0) {      // 累计入库件数
             $gp[$gb['gb_gp_id']]['in'] += $gb['gb_in'] / $gb['gn_per_pack'];
         } 
-        if ($gb['gb_out'] > 0) {    // 累计出库件数
+        if ($gb['gb_out'] != 0) {    // 累计出库件数
             $gp[$gb['gb_gp_id']]['out'] += $gb['gb_out'] / $gb['gn_per_pack'];
         }
         $place = id2name("gp_name", "{$acc_prefix}goods_place", $gb['gb_gp_id'], "gp_id");
