@@ -94,7 +94,7 @@ function cash_total($acc_prefix, $startday, $endday) {
                 FROM {$acc_prefix}fee_biz, {$acc_prefix}fee_item, {$acc_prefix}fee_series
                 WHERE fb_fi_id = fi_id AND fi_fs_id = fs_id
                 GROUP BY fi_id
-                ORDER BY fi_id";
+                ORDER BY fs_id";
     $r_fee = $wpdb->get_results($sql_fee, ARRAY_N);
 
     echo <<<Form_HTML
