@@ -89,8 +89,9 @@ function goodsbiz_list($acc_prefix, $day) {
                     <th class='manage-column'  style="">系列</th>
                     <th class='manage-column'  style="">型号</th>
                     <th class='manage-column'  style="">仓库</th>
-                    <th class='manage-column'  style="">入库 <span style="color:#AAA;">[件数]</span></th>
-                    <th class='manage-column'  style="">出库 <span style="color:#AAA;">[件数]</span></th>
+                    <th class='manage-column'  style="">件数</th>
+                    <th class='manage-column'  style="">入库</th>
+                    <th class='manage-column'  style="">出库</th>
                     <th class='manage-column'  style="">金额</th>
                     <th class='manage-column'  style="">业务摘要</th>
                 </tr>
@@ -104,8 +105,9 @@ function goodsbiz_list($acc_prefix, $day) {
                     <th class='manage-column'  style="">系列</th>
                     <th class='manage-column'  style="">型号</th>
                     <th class='manage-column'  style="">仓库</th>
-                    <th class='manage-column'  style="">入库 <span style="color:#AAA;">[件数]</span></th>
-                    <th class='manage-column'  style="">出库 <span style="color:#AAA;">[件数]</span></th>
+                    <th class='manage-column'  style="">件数</th>
+                    <th class='manage-column'  style="">入库</th>
+                    <th class='manage-column'  style="">出库</th>
                     <th class='manage-column'  style="">金额</th>
                     <th class='manage-column'  style="">业务摘要</th>
                 </tr>
@@ -135,8 +137,9 @@ Form_HTML;
             $gp[$gb['gb_gp_id']]['out'] += $gb['gb_out'] / $gb['gn_per_pack'];
         }
         $place = id2name("gp_name", "{$acc_prefix}goods_place", $gb['gb_gp_id'], "gp_id");
-        $in_number =  ( $gb['gb_in'] == 0 ) ?  '' : number_format($gb['gb_in'], 0) . ' <span style="color:#AAA;">[' . ($gb['gb_in'] / $gb['gn_per_pack']) . ']</span>';
-        $out_number = ( $gb['gb_out'] == 0 ) ?  '' : number_format($gb['gb_out'], 0) . ' <span style="color:#AAA;">[' . ($gb['gb_out'] / $gb['gn_per_pack']) . ']</span>';
+        $piece = ($gb['gb_in'] + $gb['gb_out']) / $gb['gn_per_pack'];
+        $in_number =  ( $gb['gb_in'] == 0 ) ?  '' : number_format($gb['gb_in'], 0);
+        $out_number = ( $gb['gb_out'] == 0 ) ?  '' : number_format($gb['gb_out'], 0);
         $money = ($gb['gb_money'] == 0) ? '' : number_format($gb['gb_money'], 2);
             echo "<tr class='alternate'>
                     <td class='name'>{$gb['gb_id']}</td>
@@ -145,6 +148,7 @@ Form_HTML;
                     <td class='name'>{$gb['gs_name']}</td>
                     <td class='name'>{$gb['gn_name']}</td>
                     <td class='name'>{$place}</td>
+                    <td class='name'>{$piece}</td>
                     <td class='name'>{$in_number}</td>
                     <td class='name'>{$out_number}</td>
                     <td class='name'>{$money}</td>
