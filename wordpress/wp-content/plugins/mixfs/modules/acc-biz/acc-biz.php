@@ -24,6 +24,7 @@ function acc_biz() {
 
         add_submenu_page('acc-biz-instructions', '业务处理', '业务处理', $cap, 'acc-biz-instructions', 'acc_biz_instructions');
         add_submenu_page('acc-biz-instructions', '产成品业务', '产成品业务', $cap, 'goods-biz', 'goods_biz');
+        add_submenu_page('acc-biz-instructions', '产成品订单业务', '产成品订单业务', $cap, 'goods-biz-order', 'goods_biz_order');
         add_submenu_page('acc-biz-instructions', '费用业务', '费用业务', $cap, 'fee-biz', 'fee_biz');
         add_submenu_page('acc-biz-instructions', '原材料业务', '原材料业务', $cap, 'stuff-biz', 'stuff_biz');
     }
@@ -37,6 +38,10 @@ function acc_biz_instructions() {
 
 function goods_biz() {
     include_once( 'goods-biz.php' );
+}
+
+function goods_biz_order() {
+    include_once( 'goods-biz-order.php' );
 }
 
 function fee_biz() {

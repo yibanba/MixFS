@@ -81,6 +81,10 @@ if (empty($mixfs_acc)) {
             <td class='name'><?php echo $acc_name['ma_tbl_detail']; ?></td>
         </tr>
 <?php
+            /**
+             * $_SESSION["mas"]["md5***xxx"] = lc | 老厂
+             * $_SESSION["mas"]["md5***yyy"] = zs | 注塑
+             */
             $_SESSION["mas"][$acc_name['ma_create_md5']] = $acc_name['ma_tbl_prefix'] . '|' . $acc_name['ma_tbl_name'];
         }
     }
