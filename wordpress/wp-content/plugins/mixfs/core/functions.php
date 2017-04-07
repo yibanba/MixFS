@@ -251,6 +251,100 @@ autoJS;
 } // autocompletejs
 
 /**
+ * 产成品专用自动补全，订单模式
+ * 双击显示全部
+ * 自动填充 每件双数 input
+ */
+function ordercompletejs($cols_format, $tag) {
+    echo <<<autoJS
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+
+    $.widget( "custom.catcomplete", $.ui.autocomplete, {
+        _create: function() {
+            this._super();
+            this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
+        },
+        _renderMenu: function( ul, items ) {
+            var that = this,
+            currentCategory = "";
+            $.each( items, function( index, item ) {
+                var li;
+                if ( item.category != currentCategory ) {
+                    ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+                    currentCategory = item.category;
+                }
+                li = that._renderItemData( ul, item );
+                if ( item.category ) {
+                li.attr( "aria-label", item.category + " : " + item.label );
+                }
+            });
+        }
+    });
+    
+    $( ".{$tag}" ).catcomplete({
+        delay: 0,
+        source: [$cols_format],
+        select: function( event, ui ) {
+            var v=ui.item.per_pack;
+            var i=$(".goodsbiz_order").index(this)
+            $(".per_pack").eq(i).val(v)
+	}
+    });
+    $( ".{$tag}" ).catcomplete({
+        minLength: 0
+    }).dblclick(function () {
+        $(this).catcomplete('search', '');
+    });
+    $( ".{$tag}" ).focus(function(){  
+     $(this).val("");
+    });
+    
+    //****************
+    
+    var MaxInputs = 95; //maximum input boxes allowed  
+        var InputsWrapper = $("#InputsWrapper"); //Input boxes wrapper ID  
+
+        var x = InputsWrapper.length + 5; //initlal text box count  
+        var FieldCount = 5; //to keep track of text box added  
+        $("#btn_add").click(function () {  //on add input button click  
+
+            if (x <= MaxInputs) { //max input box allowed  
+                for(var i = 0; i < 5; i++) {
+                    FieldCount++;
+                    $(InputsWrapper).append('<tr><td>' + FieldCount + '</td><td><input type="text" name="atext[]" class="goodsbiz_order" value="" /></td><td><input type="text" class="per_pack" name="quantity[]" id="field_b_' + FieldCount + '" value=""/></td><td><input type="text" name="price[]" id="field_c_' + FieldCount + '" value=""/></td><td><input type="text" name="sum[]" id="field_d_' + FieldCount + '" value="" disabled="disabled" /></td></tr>');
+                    x++;
+                }
+                //***
+                $( ".{$tag}" ).catcomplete({
+                    delay: 0,
+                    source: [$cols_format],
+                    select: function( event, ui ) {
+                        var v=ui.item.per_pack;
+                        var i=$(".goodsbiz_order").index(this)
+                        $(".per_pack").eq(i).val(v)
+                    }
+                });
+                $( ".{$tag}" ).catcomplete({
+                    minLength: 0
+                }).dblclick(function () {
+                    $(this).catcomplete('search', '');
+                });
+                $( ".{$tag}" ).focus(function(){  
+                 $(this).val("");
+                });
+                //***
+            }
+            return false;
+        });
+    
+    //***************
+});
+</script>
+autoJS;
+} // ordercompletejs
+
+/**
  * 自定义数字格式化
  */
 function mix_num($old_num, $cash=FALSE, $placeholder='') {

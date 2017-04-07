@@ -257,7 +257,7 @@ elseif ($_GET['goodspage'] == 2) {
                 <tr class="form-field">
                     <th scope="row"><label for="goodsbiz_num">数量 (必填<?php echo $returns; ?>)</label></th>
                     <td>
-                        <input name="goodsbiz_num" type="text" id="goodsbiz_num" value="" tabindex="3"> ×
+                        <input name="goodsbiz_num" type="text" id="goodsbiz_num" value="1" tabindex="3"> ×
                         <input name="per_pack" type="text" id="per_pack" value="1" tabindex="7" style="width: 4em;">
                         <label for="per_pack">双/每件</label>
                     </td>
