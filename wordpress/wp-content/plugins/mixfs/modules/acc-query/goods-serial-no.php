@@ -148,7 +148,7 @@ Form_HTML;
                     <td class='name'>{$gb['gs_name']}</td>
                     <td class='name'>{$gb['gn_name']}</td>
                     <td class='name'>{$place}</td>
-                    <td class='name'>{$piece}</td>
+                    <td class='name'><span style='color:#AAA;'>{$piece}</span></td>
                     <td class='name'>{$in_number}</td>
                     <td class='name'>{$out_number}</td>
                     <td class='name'>{$money}</td>
