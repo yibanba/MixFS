@@ -286,9 +286,10 @@ jQuery(document).ready(function($) {
         delay: 0,
         source: [$cols_format],
         select: function( event, ui ) {
-            var v=ui.item.per_pack;
-            var i=$(".goodsbiz_order").index(this)
-            $(".per_pack").eq(i).val(v)
+            var i=$(".goodsbiz_order").index(this);
+            $("input[name='per_pack[]']").eq(i).val(ui.item.per_pack);
+            $("input[name='qty[]']").eq(i).val(1);
+            $("input[name='qty[]']").eq(i).focus(); 
 	}
     });
     $( ".{$tag}" ).catcomplete({
@@ -300,10 +301,19 @@ jQuery(document).ready(function($) {
      $(this).val("");
     });
     
+    $("input").keypress(function (event) {
+        var keynum = (event.keyCode ? event.keyCode : event.which);
+        if (keynum == '13') {
+            if( !confirm("提交请点[确认]或按回车，否则点[取消]或按ESC") ) {
+                return false;
+            }
+        }
+    });
+    
     //****************
     
     var MaxInputs = 95; //maximum input boxes allowed  
-        var InputsWrapper = $("#InputsWrapper"); //Input boxes wrapper ID  
+        var InputsWrapper = $("#createuser tbody"); //Input boxes wrapper ID  
 
         var x = InputsWrapper.length + 5; //initlal text box count  
         var FieldCount = 5; //to keep track of text box added  
@@ -312,7 +322,16 @@ jQuery(document).ready(function($) {
             if (x <= MaxInputs) { //max input box allowed  
                 for(var i = 0; i < 5; i++) {
                     FieldCount++;
-                    $(InputsWrapper).append('<tr><td>' + FieldCount + '</td><td><input type="text" name="atext[]" class="goodsbiz_order" value="" /></td><td><input type="text" class="per_pack" name="quantity[]" id="field_b_' + FieldCount + '" value=""/></td><td><input type="text" name="price[]" id="field_c_' + FieldCount + '" value=""/></td><td><input type="text" name="sum[]" id="field_d_' + FieldCount + '" value="" disabled="disabled" /></td></tr>');
+                    $(InputsWrapper).append('<tr>\
+                        <td>' + FieldCount + '</td>\
+                        <td><input type="text" name="goodsbiz_name[]" class="goodsbiz_order" value="" /></td>\
+                        <td style="width: 50px;">\
+                            <input type="text" class="per_pack" name="per_pack[]" value="" style="width: 50px;background-color:#EEE;" />\
+                        </td>\
+                        <td><input type="text" name="qty[]" value="" onfocus="this.select()" /></td>\
+                        <td><input type="text" name="price[]"  value=""/></td>\
+                        <td><input type="text" name="sum[]" value="" disabled="disabled" /></td>\
+                    </tr>');
                     x++;
                 }
                 //***
@@ -320,9 +339,10 @@ jQuery(document).ready(function($) {
                     delay: 0,
                     source: [$cols_format],
                     select: function( event, ui ) {
-                        var v=ui.item.per_pack;
-                        var i=$(".goodsbiz_order").index(this)
-                        $(".per_pack").eq(i).val(v)
+                        var i=$(".goodsbiz_order").index(this);
+                        $("input[name='per_pack[]']").eq(i).val(ui.item.per_pack);
+                        $("input[name='qty[]']").eq(i).val(1);
+                        $("input[name='qty[]']").eq(i).focus(); 
                     }
                 });
                 $( ".{$tag}" ).catcomplete({
@@ -332,6 +352,15 @@ jQuery(document).ready(function($) {
                 });
                 $( ".{$tag}" ).focus(function(){  
                  $(this).val("");
+                });
+                
+                $("input").keypress(function (event) {
+                    var keynum = (event.keyCode ? event.keyCode : event.which);
+                    if (keynum == '13') {
+                        if( !confirm("提交请点[确认]或按回车，否则点[取消]或按ESC") ) {
+                            return false;
+                        }
+                    }
                 });
                 //***
             }
