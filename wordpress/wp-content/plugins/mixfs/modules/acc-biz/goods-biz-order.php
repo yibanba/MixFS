@@ -210,11 +210,14 @@ elseif ($_GET['goodspage'] == 2) {
         <div class="alignleft actions">
             <span>
                 <?php
+                $disabled="";
                 switch (TRUE) {
                     case ($_SESSION['goodsbiz']['inout'] == '入库'):
+                        $disabled = 'disabled="disabled"';
                         $inout_str = '， 入库地点：【' . id2name('gp_name', $acc_prefix . 'goods_place', $_SESSION['goodsbiz']['in'], 'gp_id') . '】';
                         break;
                     case ($_SESSION['goodsbiz']['inout'] == '移库'):
+                        $disabled = 'disabled="disabled"';
                         $inout_str = '， 移库地点：【'
                                 . id2name('gp_name', $acc_prefix . 'goods_place', $_SESSION['goodsbiz']['out'], 'gp_id') . ' >>> '
                                 . id2name('gp_name', $acc_prefix . 'goods_place', $_SESSION['goodsbiz']['in'], 'gp_id') . '】';
@@ -247,7 +250,7 @@ elseif ($_GET['goodspage'] == 2) {
                         <td><input type="text" name="goodsbiz_name[]" class="goodsbiz_order" value="" /></td>
                         <td style="width: 50px;"><input type="text" name="per_pack[]" class="per_pack" value="" style="width: 50px;background-color:#EEE;" /></td>
                         <td><input type="text" name="qty[]" value="" onfocus="this.select()" /></td>
-                        <td><input type="text" name="price[]" value="" /></td>
+                        <td><input type="text" name="price[]" value="" <?php echo $disabled; ?>/></td>
                         <td><input type="text" name="sum[]" value="" disabled="disabled" /></td>
                         <!-- <td class="removeclass"> &nbsp; </td> -->
                     </tr>
