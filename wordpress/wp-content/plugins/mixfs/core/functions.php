@@ -331,6 +331,7 @@ jQuery(document).ready(function($) {
                         <td><input type="text" name="qty[]" value="" onfocus="this.select()" /></td>\
                         <td><input type="text" name="price[]"  value=""/></td>\
                         <td><input type="text" name="sum[]" value="" disabled="disabled" /></td>\
+                        <td><input type="text" name="summary[]" value="" /></td>\
                     </tr>');
                     x++;
                 }

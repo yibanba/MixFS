@@ -59,7 +59,7 @@ if (isset($_POST['feebiz_submit'])) {
             </tr>
             <tr class="form-field">
                 <th scope="row"><label for="feebiz_item">费用项目名称 (必填)</label></th>
-                <td><input type="text" name="feebiz_item" id="feebiz_item" value="双击选择或输入关键字"></td>
+                <td><input type="text" name="feebiz_item" id="feebiz_item" value="双击选择或输入关键字" /></td>
             </tr>
             <?php
             // 自动完成文本框，选择费用名称
@@ -77,8 +77,8 @@ if (isset($_POST['feebiz_submit'])) {
             <tr class="form-field">
                 <th scope="row"><label for="feebiz_money">金额 (必填数字)</label></th>
                 <td>
-                    <input name="feebiz_money" type="text" id="feebiz_money" value="">
-                    <input name="feebiz_rate" type="text" id="feebiz_rate" value="<?php echo $_SESSION['rate']; ?>" maxlength="6" tabindex="9" style="width: 4em;">
+                    <input name="feebiz_money" type="text" id="feebiz_money" value="" />
+                    <input name="feebiz_rate" type="text" id="feebiz_rate" value="<?php echo $_SESSION['rate']; ?>" maxlength="6" tabindex="9" style="width: 4em;" />
                             <label for="feebiz_rate">美元汇率
                 </td>
             </tr>
@@ -98,7 +98,7 @@ if (isset($_POST['feebiz_submit'])) {
             </tr>
             <tr class="form-field">
                 <th scope="row"><label for="feebiz_sum">业务摘要</label></th>
-                <td><input name="feebiz_sum" type="text" id="feebiz_sum" value=""></td>
+                <td><input name="feebiz_sum" type="text" id="feebiz_sum" value="" /></td>
             </tr>
         </tbody>
     </table>
@@ -109,12 +109,6 @@ if (isset($_POST['feebiz_submit'])) {
     </p>
 </form>
 
-
-<script type="text/javascript">
-    jQuery(document).ready(function ($) {
-        $('#message').show().delay(5000).hide(0);
-    });
-</script>
 <?php
 
 /**

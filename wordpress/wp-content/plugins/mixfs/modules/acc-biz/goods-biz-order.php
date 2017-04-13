@@ -58,17 +58,18 @@ elseif (isset($_POST['btn_order'])) {
     $flag = 0;  // 数量标识
 
     if ($_SESSION['goodsbiz']['inout'] == '入库') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_gp_id`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_gp_id`, `gb_gn_id`, `gb_summary`) VALUES ";
         $order_num = count($_POST['goodsbiz_name']);
         for ($i = 0; $i < $order_num; $i++) {
             $gb_name = $_POST["goodsbiz_name"][$i];
             $gb_num = $_POST["qty"][$i] * $_POST["per_pack"][$i];
+            $gb_summary = trim($_POST["summary"][$i]);
             if ($gb_name != "" && $gb_num != 0) {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$gb_num}, {$_SESSION['goodsbiz']['in']}, {$gn_kv[$gb_name]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$gb_num}, {$_SESSION['goodsbiz']['in']}, {$gn_kv[$gb_name]}, '{$gb_summary}' ),";
                 $flag++;
             }
         }
-        if($flag > 0) {
+        if ($flag > 0) {
             $sql_format = rtrim($sql, ",");
             $wpdb->query($sql_format);
             echo "<div id='message' class='updated'><p>提交【{$flag}】条产成品业务成功</p></div>";
@@ -76,37 +77,57 @@ elseif (isset($_POST['btn_order'])) {
             echo "<div id='message' class='updated'><p>请完成(必填)选项后再提交</p></div>";
         }
     } elseif ($_SESSION['goodsbiz']['inout'] == '销售或退回') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_out`, `gb_money`, `gb_gp_id`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_out`, `gb_money`, `gb_gp_id`, `gb_gn_id`, `gb_summary`) VALUES ";
         $order_num = count($_POST['goodsbiz_name']);
         for ($i = 0; $i < $order_num; $i++) {
             $gb_name = $_POST["goodsbiz_name"][$i];
             $gb_num = $_POST["qty"][$i] * $_POST["per_pack"][$i];
             $money = trim($_POST['price'][$i]) * $gb_num;
+            $gb_summary = trim($_POST["summary"][$i]);
             if ($gb_name != "" && $gb_num != 0 && $money != 0) {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$gb_num}, {$money}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$gb_name]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$gb_num}, {$money}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$gb_name]}, '{$gb_summary}' ),";
                 $flag++;
             }
         }
-        if($flag > 0) {
+        if ($flag > 0) {
             $sql_format = rtrim($sql, ",");
             $wpdb->query($sql_format);
             echo "<div id='message' class='updated'><p>提交【{$flag}】条产成品业务成功</p></div>";
         } else {
             echo "<div id='message' class='updated'><p>请完成(必填)选项后再提交</p></div>";
         }
+
+        // 批量提交销售单，同步提交折扣或销售样品 表单
+        $_SESSION['goodsbiz']['feebiz'] = $_POST['feebiz_item'];
+        $fi_fields = $wpdb->get_row("SELECT fi_id, fi_in_out FROM {$acc_prefix}fee_item WHERE fi_name = '{$_SESSION['goodsbiz']['feebiz']}'", ARRAY_A);
+        $fee_item_id = $fi_fields['fi_id'];
+        $in_out = ($fi_fields['fi_in_out'] == '1') ? 'fb_in' : 'fb_out';
+
+        $money = trim($_POST['feebiz_money']);
+        if ( $fee_item_id && is_numeric($_POST['feebiz_money']) ) {
+            $wpdb->insert($acc_prefix . 'fee_biz', array(
+                'fb_date' => $_SESSION['goodsbiz']['date'],
+                $in_out => $money,
+                'fb_summary' => trim($_POST['feebiz_sum']),
+                'fb_fi_id' => $fee_item_id
+                    )
+            );
+            echo "<div id='message' class='updated'><p>提交【{$_POST['feebiz_item']}】资金往来项目成功</p></div>";
+        }
     } elseif ($_SESSION['goodsbiz']['inout'] == '移库') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_out`, `gb_gp_id`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_out`, `gb_gp_id`, `gb_gn_id`, `gb_summary`) VALUES ";
         $order_num = count($_POST['goodsbiz_name']);
         for ($i = 0; $i < $order_num; $i++) {
             $gb_name = $_POST["goodsbiz_name"][$i];
             $gb_num = $_POST["qty"][$i] * $_POST["per_pack"][$i];
+            $gb_summary = trim($_POST["summary"][$i]);
             if ($gb_name != "" && $gb_num != 0) {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', 0, {$gb_num}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$gb_name]} ),";
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$gb_num}, 0, {$_SESSION['goodsbiz']['in']}, {$gn_kv[$gb_name]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', 0, {$gb_num}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$gb_name]}, '{$gb_summary}' ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$gb_num}, 0, {$_SESSION['goodsbiz']['in']}, {$gn_kv[$gb_name]}, '{$gb_summary}' ),";
                 $flag++;
             }
         }
-        if($flag > 0) {
+        if ($flag > 0) {
             $sql_format = rtrim($sql, ",");
             $wpdb->query($sql_format);
             echo "<div id='message' class='updated'><p>提交【{$flag}】条产成品业务成功</p></div>";
@@ -114,9 +135,8 @@ elseif (isset($_POST['btn_order'])) {
             echo "<div id='message' class='updated'><p>请完成(必填)选项后再提交</p></div>";
         }
     }
-    
-    //**********************************************************************************************
 
+    //**********************************************************************************************
     //**********************************************************************************************
 } // elseif (isset($_POST['goodsbiz_submit']))
 elseif (isset($_POST['update_per_pack'])) {
@@ -210,7 +230,7 @@ elseif ($_GET['goodspage'] == 2) {
         <div class="alignleft actions">
             <span>
                 <?php
-                $disabled="";
+                $disabled = "";
                 switch (TRUE) {
                     case ($_SESSION['goodsbiz']['inout'] == '入库'):
                         $disabled = 'disabled="disabled"';
@@ -238,37 +258,68 @@ elseif ($_GET['goodspage'] == 2) {
     </div>
     <form action="" method="post" name="createuser" id="createuser" class="validate">
 
-        <table class="form-table">
+        <table class="wp-list-table widefat fixed users" cellspacing="1">
             <thead>
-                <tr><th>行号</th><th>品名</th><th style="width: 50px;">双/件</th><th>件数</th><th>单价</th><th>小计</th></tr>
+                <tr><th style="width: 50px;">行号</th><th>品名</th><th style="width: 50px;">双/件</th><th>件数</th><th>单价</th><th>小计</th><th>摘要</th></tr>
             </thead>
+            <tfoot>
+                <tr><th style="width: 50px;">行号</th><th>品名</th><th style="width: 50px;">双/件</th><th>件数</th><th>单价</th><th>小计</th><th>摘要</th></tr>
+            </tfoot>
             <tbody>
 
                 <?php for ($i = 1; $i <= 5; $i++) : ?>
                     <tr>
-                        <td><?php echo $i; ?></td>
+                        <td style="width: 50px;"><?php echo $i; ?></td>
                         <td><input type="text" name="goodsbiz_name[]" class="goodsbiz_order" value="" /></td>
                         <td style="width: 50px;"><input type="text" name="per_pack[]" class="per_pack" value="" style="width: 50px;background-color:#EEE;" /></td>
                         <td><input type="text" name="qty[]" value="" onfocus="this.select()" /></td>
                         <td><input type="text" name="price[]" value="" <?php echo $disabled; ?>/></td>
                         <td><input type="text" name="sum[]" value="" disabled="disabled" /></td>
+                        <td><input type="text" name="summary[]" value="" /></td>
                         <!-- <td class="removeclass"> &nbsp; </td> -->
                     </tr>
                 <?php endfor; ?>
             </tbody>
         </table>
+        <?php if ($_SESSION['goodsbiz']['inout'] == '销售或退回') : ?>
+            <div class="manage-menus">
+                <div class="alignleft actions">
+                    <span>
+                        <label for="feebiz_item">费用名称</label>
+                        <input type="text" name="feebiz_item" id="feebiz_item" value="<?php echo $_SESSION['goodsbiz']['feebiz'];?>" /> &nbsp; 
+                        <label for="feebiz_money"> 费用金额</label>
+                        <input name="feebiz_money" type="text" id="feebiz_money" value="" /> &nbsp; 
+                        <label for="feebiz_sum"> 费用摘要</label>
+                        <input name="feebiz_sum" type="text" id="feebiz_sum" value="" />
+                    </span>
+                </div>
+                <div class="alignright actions">
+                    <label for="tags">件数</label><input class="ti" id="amount" style="width: 100px;" />  &nbsp; 
+                    <label for="tags">金额</label><input class="ti" id="total" style="width: 100px;" />
+                </div>
+                <br class="clear" />
+            </div>
+            <?php
+        endif;
+        // 自动完成文本框，选择费用名称
+        $fee_cols = $wpdb->get_results("SELECT fs_name, fi_name, fi_id FROM {$acc_prefix}fee_item, {$acc_prefix}fee_series "
+                . " WHERE fi_fs_id=fs_id ORDER BY fi_fs_id, fi_name", ARRAY_A);
 
+        $cols_str = '';
+        foreach ($fee_cols as $value) {
+            $cols_str .= '{ label: "' . $value['fi_name'] . '", category: "' . $value['fs_name'] . ' 总分类"},';
+        }
+        $cols_format = rtrim($cols_str, ',');
+
+        autocompletejs($cols_format, 'feebiz_item');
+        ?>
         <p class="submit">
             <input type="submit" value="提交订单" name="btn_order" class="button button-primary">
             <input type="reset" value="清空内容" name="btn_reset" class="button button-primary">
             <input type="button" name="goodsbiz_return" id="goodsbiz_return" class="button button-primary" value="返回上级" 
                    onclick="location.href = location.href.substring(0, location.href.indexOf('&goods'))" />&nbsp; 
             <input type="button" value="添加表格" id="btn_add" class="button">
-            <span style="margin-left: 30px">
-                <label for="tags">件数合计:</label><input class="ti" id="amount">  &nbsp; 
-                <label for="tags">金额合计:</label><input class="ti" id="total">
-            </span>
-    </p>
+        </p>
 
     </form>
 
@@ -287,21 +338,21 @@ elseif ($_GET['goodspage'] == 2) {
                 var i = 0;
                 var amount = 0;
                 var total = 0;
-                var sign=1;
-                var t=0; // temp of sum
+                var sign = 1;
+                var t = 0; // temp of sum
                 $("input[name='sum[]']").each(function () {
                     var pack = (arr_pack[i].value != 0) ? arr_pack[i].value : 0;
                     var q = (arr_qty[i].value != 0) ? arr_qty[i].value : 0;
                     var p = (arr_price[i].value != 0) ? arr_price[i].value : 0;
-                    if(q<0 && p<0) {
-                        sign=-1;
+                    if (q < 0 && p < 0) {
+                        sign = -1;
                     }
                     t = pack * q * p * sign;
                     t = parseFloat(t.toFixed(2));
-                    $(this).val( t );
+                    $(this).val(t);
                     i++;
                     amount += q * 1;
-                    
+
                     total += t;
                 });
                 $("#amount").val(amount);
