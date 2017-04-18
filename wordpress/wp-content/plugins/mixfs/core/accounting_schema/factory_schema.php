@@ -159,6 +159,15 @@ function create_factory_tables($tbl_prefix) {
             `ss_name` varchar(30) NOT NULL,
             `ss_summary` varchar(100) DEFAULT NULL,
             PRIMARY KEY (`ss_id`)
+          ) $collate;",
+        "CREATE TABLE IF NOT EXISTS `{$tbl_prefix}_currency_biz` (
+            `cb_id` int(9) NOT NULL AUTO_INCREMENT,
+            `cb_date` date NOT NULL,
+            `cb_money` decimal(12,2) DEFAULT '0.00',
+            `cb_rate` decimal(12,4) NOT NULL DEFAULT '0.0000',
+            `cb_summary` varchar(100) DEFAULT NULL,
+            `cb_fi_id` int(9) NOT NULL,
+            PRIMARY KEY (`cb_id`)
           ) $collate;"
     ];
 

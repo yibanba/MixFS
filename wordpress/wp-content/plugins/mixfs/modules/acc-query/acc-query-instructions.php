@@ -1,5 +1,4 @@
 <?php
-
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
 
@@ -12,26 +11,22 @@ isset($_SESSION['qry_date']['date1']) ?: $_SESSION['qry_date']['date1'] = date("
 isset($_SESSION['qry_date']['date2']) ?: $_SESSION['qry_date']['date2'] = date("Y-m-d");
 
 
-if(isset($_POST['btn_qry_cash'])) {
-    
+if (isset($_POST['btn_qry_cash'])) {
+
     $_SESSION['qry_date']['date1'] = $_POST['qry_date1'];
     $_SESSION['qry_date']['date2'] = $_POST['qry_date2'];
-    
+
     form_qry_cash();
     echo "<div id='message' class='updated'><p>下表为 {$_SESSION['qry_date']['date1']} —— {$_SESSION['qry_date']['date2']} 期间现金汇总, 前期余额为 {$_SESSION['qry_date']['date1']} 日之前的该项目余额</p></div>";
 
     cash_total($acc_prefix, $_SESSION['qry_date']['date1'], $_SESSION['qry_date']['date2']);
-            
 } else {
-    
+
     form_qry_cash();
-    
 } // $_REQUES Processing is complete
 
 mixfs_bottom(); // 框架页面底部
 //******************************************************************************
-
-
 
 function form_qry_cash() {
     ?>
@@ -55,15 +50,15 @@ function form_qry_cash() {
         <br />
     </form>
     <?php
-} // function form_qry_fee()
+}
 
+// function form_qry_fee()
 
 /**
  *
  * 计算现金余额：资金来源（产成品、原材料、借款、赊销返款） - 资金运用（费用、还款）
  * @return type  计算 (销售总额，借贷净值，费用总额)
  */
-
 function cash_total($acc_prefix, $startday, $endday) {
     global $wpdb;
     // 1、产品销售
@@ -127,7 +122,7 @@ function cash_total($acc_prefix, $startday, $endday) {
             </tfoot>
             <tbody>
 Form_HTML;
-    
+
     echo "<tr class='alternate'>
                     <td class='name'>1</td>
                     <td class='name' colspan='2'>产成品销售</td>
@@ -144,7 +139,7 @@ Form_HTML;
                     <td class='name'>+</td>
                     <td class='name'>" . mix_num($stuff_prior, 2) . "</td>
                     <td class='name'>" . mix_num(($stuff_current - $stuff_prior + (-$stuff_return)), 2) . "</td>
-                    <td class='name'>" . mix_num(-1 * $stuff_return , 2) . "</td>
+                    <td class='name'>" . mix_num(-1 * $stuff_return, 2) . "</td>
                     <td class='name'>" . mix_num($stuff_current, 2) . "</td>
                     <td class='name'>现金减少为销售退回</td>
                 </tr>";
@@ -154,9 +149,8 @@ Form_HTML;
      * $pre_balance = 前期余额，$cur_breakeven = 当期盈亏
      */
     $pre_balance = $goods_prior + $stuff_prior;
-    $cur_breakeven = ($goods_current - $goods_prior)
-                    + ($stuff_current - $stuff_prior);
-    
+    $cur_breakeven = ($goods_current - $goods_prior) + ($stuff_current - $stuff_prior);
+
     $counter = 2;           // 产品和原材料占用 2 行
 
     if (count($r_fee) > 0) {
@@ -180,10 +174,10 @@ Form_HTML;
 
             // fb_in, fb_out不应该同时有金额，所以相加$fields[4] + $fields[5]求前期余额
             echo ($fields[5] == 1) ? "<td class='name'>+</td>" : "<td class='name'>-</td>";
-            
+
             // 差 2 个字段
 
-            echo  "<td class='name'>" .mix_num(abs($fields[6] - $fields[7]), 2) . "</td>
+            echo "<td class='name'>" . mix_num(abs($fields[6] - $fields[7]), 2) . "</td>
                    <td class='name'>" . mix_num($fields[8], 2) . "</td>
                    <td class='name'>" . mix_num($fields[9], 2) . "</td>
                    <td class='name'>" . mix_num(abs($fields[6] - $fields[7] + $fields[8] - $fields[9]), 2) . "</td>
@@ -194,11 +188,11 @@ Form_HTML;
         }
         echo "</tbody></table>";
     }
-    
+
     $pre = mix_num($pre_balance, 2);
     $cur = mix_num($cur_breakeven, 2);
     $balance = mix_num($pre_balance + $cur_breakeven, 2);
-    
+
     echo <<<Form_HTML
         <br />
     <table class="wp-list-table widefat fixed users" cellspacing="1">
@@ -221,7 +215,25 @@ Form_HTML;
         </tr>
     </thead>
 Form_HTML;
-            
+
     echo '</table><br />';
 
+    // 外币余额
+    $currency_sql = "SELECT fi_name, sum(cb_money) AS m"
+            . " FROM {$acc_prefix}currency_biz, {$acc_prefix}fee_item "
+            . " WHERE cb_date <= '{$endday}' AND cb_fi_id=fi_id GROUP BY cb_fi_id";
+    $currency = $wpdb->get_results($currency_sql, ARRAY_A);
+    echo '<table class="wp-list-table widefat fixed users" cellspacing="1">
+    <thead>
+        <tr>
+            <th class="manage-column">外币账户：记账货币之外的其它货币现金余额</th>
+        </tr>
+    </thead>';
+    foreach ($currency as $balance) {
+        echo "<tr class='alternate'>
+            <td><span>{$balance['fi_name']} : {$balance['m']}</span></td>
+            </tr>";
+    }
+    echo '</table><br />';
+    // 外币余额
 } // function cash_total
