@@ -82,10 +82,11 @@ elseif (isset($_POST['btn_order'])) {
         for ($i = 0; $i < $order_num; $i++) {
             $gb_name = $_POST["goodsbiz_name"][$i];
             $gb_num = $_POST["qty"][$i] * $_POST["per_pack"][$i];
-            $money = trim($_POST['price'][$i]) * $gb_num;
+            $money = trim($_POST['price'][$i]);
+            $gb_money = ($money < 0 && $gb_num < 0) ? (-1 * $money * $gb_num) : ($money * $gb_num); // 退货 - 
             $gb_summary = trim($_POST["summary"][$i]);
             if ($gb_name != "" && $gb_num != 0 && $money != 0) {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$gb_num}, {$money}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$gb_name]}, '{$gb_summary}' ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$gb_num}, {$gb_money}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$gb_name]}, '{$gb_summary}' ),";
                 $flag++;
             }
         }
