@@ -312,7 +312,7 @@ jQuery(document).ready(function($) {
     
     //****************
     
-    var MaxInputs = 95; //maximum input boxes allowed  
+    var MaxInputs = 100; //maximum input boxes allowed  
         var InputsWrapper = $("#createuser tbody"); //Input boxes wrapper ID  
 
         var x = InputsWrapper.length + 5; //initlal text box count  
