@@ -90,12 +90,13 @@ elseif (isset($_POST['btn_order'])) {
                 $flag++;
             }
         }
+	$msg='';
         if ($flag > 0) {
             $sql_format = rtrim($sql, ",");
             $wpdb->query($sql_format);
-            echo "<div id='message' class='updated'><p>提交【{$flag}】条产成品业务成功</p></div>";
+            $msg .= "提交【{$flag}】条产成品业务成功！";
         } else {
-            echo "<div id='message' class='updated'><p>请完成(必填)选项后再提交</p></div>";
+            $msg .= "请完成(必填)选项后再提交！";
         }
 
         // 批量提交销售单，同步提交折扣或销售样品 表单
@@ -113,8 +114,9 @@ elseif (isset($_POST['btn_order'])) {
                 'fb_fi_id' => $fee_item_id
                     )
             );
-            echo "<div id='message' class='updated'><p>提交【{$_POST['feebiz_item']}】资金往来项目成功</p></div>";
+            $msg .= " &nbsp; 提交【{$_POST['feebiz_item']}】资金往来项目成功！";
         }
+	echo "<div id='message' class='updated'><p>" . $msg . "</p></div>";
     } elseif ($_SESSION['goodsbiz']['inout'] == '移库') {
         $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_out`, `gb_gp_id`, `gb_gn_id`, `gb_summary`) VALUES ";
         $order_num = count($_POST['goodsbiz_name']);
