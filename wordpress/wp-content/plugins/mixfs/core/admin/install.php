@@ -42,7 +42,7 @@ function core_install_tables() {
     mixfs_table_install("user_log", "(
         `log_id` int(9) NOT NULL AUTO_INCREMENT,
         `uid` int(9) NOT NULL,
-        `logintime` datetime NOT NULL,
+        `logintime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `ip` varchar(30) NOT NULL,
         `account` varchar(30) NOT NULL,
         PRIMARY KEY (`log_id`)
