@@ -29,6 +29,7 @@ function acc_query() {
         add_submenu_page('acc-query-instructions', '原材料查询', '原材料查询', $cap, 'stuff-qry', 'stuff_qry');
         add_submenu_page('acc-query-instructions', '产成品业务流水', '产成品业务流水', $cap, 'goods-serial-no', 'goods_serial_no');
         add_submenu_page('acc-query-instructions', '费用业务流水', '费用业务流水', $cap, 'fee-serial-no', 'fee_serial_no');
+        add_submenu_page('acc-query-instructions', '赊销业务查询', '赊销业务查询', $cap, 'credit-qry', 'credit_qry');
     } elseif ($cap == 'mixfs_manager') {
         add_menu_page('', '明细查询', $cap, 'acc-query-instructions', 'acc_query_instructions', '', 130);
 
@@ -38,6 +39,7 @@ function acc_query() {
         add_submenu_page('acc-query-instructions', '原材料查询', '原材料查询', $cap, 'stuff-qry', 'stuff_qry');
         add_submenu_page('acc-query-instructions', '产成品业务流水', '产成品业务流水', $cap, 'goods-serial-no', 'goods_serial_no');
         add_submenu_page('acc-query-instructions', '费用业务流水', '费用业务流水', $cap, 'fee-serial-no', 'fee_serial_no');
+        add_submenu_page('acc-query-instructions', '赊销业务查询', '赊销业务查询', $cap, 'credit-qry', 'credit_qry');
     }
 }
 
@@ -65,4 +67,8 @@ function goods_serial_no() {
 
 function fee_serial_no() {
     include_once( 'fee-serial-no.php' );
+}
+
+function credit_qry() {
+    include_once( 'credit-qry.php' );
 }
