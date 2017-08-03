@@ -284,8 +284,8 @@ elseif ($_GET['goodspage'] == 2) {
                 <?php endfor; ?>
             </tbody>
         </table>
-        <?php if ($_SESSION['goodsbiz']['inout'] == '销售或退回') : ?>
             <div class="manage-menus">
+        <?php if ($_SESSION['goodsbiz']['inout'] == '销售或退回') : ?>
                 <div class="alignleft actions">
                     <span>
                         <label for="feebiz_item">费用名称</label>
@@ -296,6 +296,7 @@ elseif ($_GET['goodspage'] == 2) {
                         <input name="feebiz_sum" type="text" id="feebiz_sum" value="" />
                     </span>
                 </div>
+        <?php endif; ?>
                 <div class="alignright actions">
                     <label for="tags">件数</label><input class="ti" id="amount" style="width: 100px;" />  &nbsp; 
                     <label for="tags">金额</label><input class="ti" id="total" style="width: 100px;" />
@@ -303,7 +304,6 @@ elseif ($_GET['goodspage'] == 2) {
                 <br class="clear" />
             </div>
             <?php
-        endif;
         // 自动完成文本框，选择费用名称
         $fee_cols = $wpdb->get_results("SELECT fs_name, fi_name, fi_id FROM {$acc_prefix}fee_item, {$acc_prefix}fee_series "
                 . " WHERE fi_fs_id=fs_id ORDER BY fi_fs_id, fi_name", ARRAY_A);
