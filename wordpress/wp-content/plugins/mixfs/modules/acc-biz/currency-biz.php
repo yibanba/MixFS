@@ -75,7 +75,7 @@ if (isset($_POST['currencybiz_submit'])) {
             <?php
             // 自动完成文本框，选择费用名称
             $currency_cols = $wpdb->get_results("SELECT fs_name, fi_name, fi_id FROM {$acc_prefix}fee_item, {$acc_prefix}fee_series "
-                    . " WHERE fi_fs_id=fs_id AND fs_name='外币账户' ORDER BY fi_fs_id, fi_name", ARRAY_A);
+                    . " WHERE fi_fs_id=fs_id AND fs_name='其它账户' ORDER BY fi_fs_id, fi_name", ARRAY_A);
 
             $cols_str = '';
             foreach ($currency_cols as $value) {
@@ -146,7 +146,7 @@ Form_HTML;
 
 $results_currencybiz = $wpdb->get_results("SELECT fb_id, fb_date, fs_name, fi_name, fb_in, fb_out, fb_summary "
         . " FROM {$acc_prefix}fee_biz, {$acc_prefix}fee_item, {$acc_prefix}fee_series "
-        . " WHERE fi_fs_id = fs_id AND fb_fi_id = fi_id AND fs_name='外币账户' "
+        . " WHERE fi_fs_id = fs_id AND fb_fi_id = fi_id AND fs_name='其它账户' "
         . " ORDER BY fb_id DESC LIMIT {$list_total} ", ARRAY_A);
 
 foreach ($results_currencybiz as $fb) {
