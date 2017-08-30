@@ -8,7 +8,7 @@ include_once ( MixFS_PATH . 'core/phpexcel/PHPExcel.php');
     <div class="alignleft actions">
         <span>
             <?php
-            echo '当前日期：【' . date('Y-m-d') . '】， 业务类型：添加【' . $_SESSION['goods_series'] . '】产品信息';
+            echo '当前日期：【' . date('Y-m-d') . '】， 业务类型：添加产品信息';
             ?>
         </span>
     </div>
@@ -63,7 +63,7 @@ if ($_POST['submit_upload']) {
 } // if ($_POST['submit_upload'])
 elseif (isset($_POST['import_file'])) {
 
-    $total = input_excel($_SESSION['addgoods']['file'], $_SESSION['goods_series_id'], $acc_prefix);
+    $total = input_excel($_SESSION['addgoods']['file'], $acc_prefix);
 
     echo "<div id='message' class='updated'><p>共成功提交 {$total} 条记录</p></div>";
 }
@@ -78,21 +78,21 @@ elseif (isset($_POST['import_file'])) {
  * @param type $ver path + filename + .xls|.xlsx
  *  5列：系列名，A品名，价格，C摘要，B件双
  */
-function input_excel($ver, $series_id, $acc_prefix) {
+function input_excel($ver, $acc_prefix) {
     global $wpdb;
     $objPHPExcel = PHPExcel_IOFactory::load($ver);
     $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
     $sql = '';
     $row_no = 0;
 
-        $sql .= "INSERT INTO `{$acc_prefix}goods_name` (`gn_gs_id`, `gn_name`, `gn_price`,`gn_summary`, `gn_per_pack`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_name` (`gn_gs_id`, `gn_name`, `gn_per_pack`, `gn_summary`, `gn_price`) VALUES ";
         foreach ($sheetData as $value) {
-            if ($value['A'] == '品名' && $value['B'] == '件双') {
+            if ($value['A'] == '系列' && $value['B'] == '品名' && $value['C'] == '件双') {
                 continue;
-            } elseif ($value['A'] == '' || $value['B'] == '') {
+            } elseif ($value['A'] == '' || $value['B'] == '' || $value['C'] == '') {
                 break;
             } else {
-                $sql .= "( $series_id, '{$value['A']}', 1, '{$value['C']}', {$value['B']} ),";
+                $sql .= "( '{$value['A']}', '{$value['B']}', '{$value['C']}', '{$value['D']}', 1. ),";
             }
             $row_no++;
         }

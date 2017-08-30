@@ -106,11 +106,6 @@ function form_add_goods($acc_prefix, $series_name) { // 添加产品系列
                 <input type="button" name="btn_series_return" id="btn_series_return" class="button" value="返回添加系列" 
                     onclick="location.href=location.href.substring(0, location.href.indexOf('&series_id'))" />
             </div>
-            <div class="alignright actions">
-            <input type="button" name="goods_import" id="goods_import" class="button" value="Excel 批量导入" 
-                   onclick="location.href = location.href.substring(0, location.href.indexOf('&series_id')) + '&addgoods=import'" />
-            </div>
-            <br class="clear" />
         </div>
     </form>
 Mix_HTML;
@@ -198,6 +193,10 @@ function form_add_series($acc_prefix) { // 添加系列表单
                                }" />
                 <input type="submit" name="btn_series_add" id="btn_series_add" class="button" value="添加系列名称"  />
                 <input type="submit" name="btn_series_show" id="btn_series_show" class="button" value="显示所有产品"  />
+            </div>
+            <div class="alignright actions">
+            <input type="button" name="goods_import" id="goods_import" class="button button-primary" value="Excel 批量导入" 
+                   onclick="location.href = location.href + '&addgoods=import'" />
             </div>
             <br class="clear" />
         </div>
