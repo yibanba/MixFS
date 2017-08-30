@@ -127,6 +127,7 @@ function read_excel($ver, $gn_kv) {
                 . "<th style='padding:5px'>{$value['A']}</th>"
                 . "<th style='padding:5px'>{$value['B']}</th>"
                 . "<th style='padding:5px'>{$value['C']}</th>"
+                . "<th style='padding:5px'>{$value['D']}</th>"
                 . "<th style='padding:5px'>错误提示</th>"
                 . "</tr>";
             } else {
@@ -139,6 +140,7 @@ function read_excel($ver, $gn_kv) {
                 . "<td style='padding:5px'>{$value['A']}</td>"
                 . "<td style='padding:5px'>{$value['B']}</td>"
                 . "<td style='padding:5px'>{$value['C']}</td>"
+                . "<td style='padding:5px'>{$value['D']}</td>"
                 . "<td style='padding:5px'>{$err_tips}</td>"
                 . "</tr>";
             }
