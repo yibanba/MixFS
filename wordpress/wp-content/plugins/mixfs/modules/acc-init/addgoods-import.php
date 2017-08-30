@@ -131,7 +131,7 @@ function read_excel($ver, $gn_kv) {
                 . "<th style='padding:5px'>错误提示</th>"
                 . "</tr>";
             } else {
-                if (array_key_exists((string)$value['A'], $gn_kv)) {
+                if (array_key_exists((string)$value['B'], $gn_kv)) {
                     ++$err_num;
                     $err_tips = '有此产品';
                 }
