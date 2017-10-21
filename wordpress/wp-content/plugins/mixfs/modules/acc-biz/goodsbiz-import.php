@@ -79,7 +79,7 @@ if ($_POST['submit_upload']) {
 } // if ($_POST['submit_upload'])
 elseif (isset($_POST['import_file'])) {
 
-    $total = input_excel($_SESSION['goodsbiz']['file'], $_SESSION['goodsbiz']['inout'], $gn_kv, $acc_prefix);
+    $total = input_excel($_SESSION['goodsbiz']['file'], $_SESSION['goodsbiz']['inout'], $gn_kv, $acc_prefix, $current_user->ID, $gb_userIP );
 
     echo "<div id='message' class='updated'><p>共成功提交 {$total} 条记录</p></div>";
 }
@@ -94,7 +94,7 @@ elseif (isset($_POST['import_file'])) {
  * @param type $ver path + filename + .xls|.xlsx
  * @param type $biz_type 业务类型：入库，移库，销售或退回
  */
-function input_excel($ver, $biz_type, $gn_kv, $acc_prefix) {
+function input_excel($ver, $biz_type, $gn_kv, $acc_prefix, $userID, $gb_userIP) {
     global $wpdb;
     $objPHPExcel = PHPExcel_IOFactory::load($ver);
     $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
@@ -109,7 +109,7 @@ function input_excel($ver, $biz_type, $gn_kv, $acc_prefix) {
             } elseif ($value['A'] == '' || $value['B'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$value['B']}, {$gn_kv[$value['A']]}, '{$_SESSION['goodsbiz']['date']}', {$current_user->ID}, '{$gb_userIP}' ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$value['B']}, {$gn_kv[$value['A']]}, '{$_SESSION['goodsbiz']['date']}', {$userID}, '{$gb_userIP}' ),";
             }
             $row_no++;
         }
@@ -121,7 +121,7 @@ function input_excel($ver, $biz_type, $gn_kv, $acc_prefix) {
             } elseif ($value['A'] == '' || $value['B'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$gn_kv[$value['A']]}, '{$_SESSION['goodsbiz']['date']}', {$current_user->ID}, '{$gb_userIP}' ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$gn_kv[$value['A']]}, '{$_SESSION['goodsbiz']['date']}', {$userID}, '{$gb_userIP}' ),";
             }
             $row_no++;
         }
@@ -133,7 +133,7 @@ function input_excel($ver, $biz_type, $gn_kv, $acc_prefix) {
             } elseif ($value['A'] == '' || $value['B'] == '' || $value['C'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$value['C']}, {$gn_kv[$value['A']]}, '{$_SESSION['goodsbiz']['date']}', {$current_user->ID}, '{$gb_userIP}' ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$value['C']}, {$gn_kv[$value['A']]}, '{$_SESSION['goodsbiz']['date']}', {$userID}, '{$gb_userIP}' ),";
             }
             $row_no++;
         }
