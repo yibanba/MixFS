@@ -99,39 +99,38 @@ function input_excel($ver, $biz_type, $gn_kv, $acc_prefix) {
     $row_no = 0;
 
     if ($biz_type == '入库') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_gp_id`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_num`, `gb_gn_id`) VALUES ";
         foreach ($sheetData as $value) {
             if ($value['A'] == '品名' && $value['B'] == '数量') {
                 continue;
             } elseif ($value['A'] == '' || $value['B'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$value['B']}, {$_SESSION['goodsbiz']['in']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$value['B']}, {$gn_kv[$value['A']]} ),";
             }
             $row_no++;
         }
     } elseif ($biz_type == '移库') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_out`, `gb_gp_id`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_out`, `gb_num`, `gb_gn_id`) VALUES ";
         foreach ($sheetData as $value) {
             if ($value['A'] == '品名' && $value['B'] == '数量') {
                 continue;
             } elseif ($value['A'] == '' || $value['B'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', 0, {$value['B']}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$value['A']]} ),";
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$value['B']}, 0, {$_SESSION['goodsbiz']['in']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$gn_kv[$value['A']]} ),";
             }
             $row_no++;
         }
     } elseif ($biz_type == '销售或退回') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_out`, `gb_money`, `gb_gp_id`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_out`, `gb_num`, `gb_money`, `gb_gn_id`) VALUES ";
         foreach ($sheetData as $value) {
             if ($value['A'] == '品名' && $value['B'] == '数量') {
                 continue;
             } elseif ($value['A'] == '' || $value['B'] == '' || $value['C'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$value['B']}, {$value['C']}, {$_SESSION['goodsbiz']['out']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$value['C']}, {$gn_kv[$value['A']]} ),";
             }
             $row_no++;
         }
