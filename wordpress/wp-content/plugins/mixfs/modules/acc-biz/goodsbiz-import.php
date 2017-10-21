@@ -6,6 +6,9 @@ include_once ( MixFS_PATH . 'core/phpexcel/PHPExcel.php');
 
 $upload_dir = upload_dir();
 
+global $wpdb, $current_user;
+$gb_userIP = preg_replace( '/[^0-9a-fA-F:., ]/', '',$_SERVER['REMOTE_ADDR'] );
+
 $goods_names = $wpdb->get_results("SELECT gn_id, gn_name FROM {$acc_prefix}goods_name", ARRAY_A);
 $gn_kv = array(); // 产成品名称键值对， 品名=>ID
 foreach ($goods_names as $v) {
@@ -99,38 +102,38 @@ function input_excel($ver, $biz_type, $gn_kv, $acc_prefix) {
     $row_no = 0;
 
     if ($biz_type == '入库') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_num`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_num`, `gb_gn_id`, `gb_createdate`, `gb_userID`, `gb_userIP`) VALUES ";
         foreach ($sheetData as $value) {
             if ($value['A'] == '品名' && $value['B'] == '数量') {
                 continue;
             } elseif ($value['A'] == '' || $value['B'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$value['B']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$value['B']}, {$gn_kv[$value['A']]}, '{$_SESSION['goodsbiz']['date']}', {$current_user->ID}, '{$gb_userIP}' ),";
             }
             $row_no++;
         }
     } elseif ($biz_type == '移库') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_out`, `gb_num`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_in`, `gb_out`, `gb_num`, `gb_gn_id`, `gb_createdate`, `gb_userID`, `gb_userIP`) VALUES ";
         foreach ($sheetData as $value) {
             if ($value['A'] == '品名' && $value['B'] == '数量') {
                 continue;
             } elseif ($value['A'] == '' || $value['B'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['in']}, {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$gn_kv[$value['A']]}, '{$_SESSION['goodsbiz']['date']}', {$current_user->ID}, '{$gb_userIP}' ),";
             }
             $row_no++;
         }
     } elseif ($biz_type == '销售或退回') {
-        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_out`, `gb_num`, `gb_money`, `gb_gn_id`) VALUES ";
+        $sql .= "INSERT INTO `{$acc_prefix}goods_biz` (`gb_date`, `gb_out`, `gb_num`, `gb_money`, `gb_gn_id`, `gb_createdate`, `gb_userID`, `gb_userIP`) VALUES ";
         foreach ($sheetData as $value) {
             if ($value['A'] == '品名' && $value['B'] == '数量') {
                 continue;
             } elseif ($value['A'] == '' || $value['B'] == '' || $value['C'] == '') {
                 break;
             } else {
-                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$value['C']}, {$gn_kv[$value['A']]} ),";
+                $sql .= "( '{$_SESSION['goodsbiz']['date']}', {$_SESSION['goodsbiz']['out']}, {$value['B']}, {$value['C']}, {$gn_kv[$value['A']]}, '{$_SESSION['goodsbiz']['date']}', {$current_user->ID}, '{$gb_userIP}' ),";
             }
             $row_no++;
         }
